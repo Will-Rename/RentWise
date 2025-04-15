@@ -66,3 +66,10 @@ def delete_listing(landlord_id, apartment_id):
         print(f"Apartment Listing for {valid_apartment.apartment_name} has been deleted")
 
 #get_landlord_apartments
+def get_landlord_apartments(landlord_id):
+    valid_landlord = Landlord.query.get(landlord_id)
+    if not valid_landlord:
+        return None
+    else:
+        landlord_apartments = Apartment.query.filter_by(landlord_id=landlord_id).all()
+        return [apartment.get_json() for apartment in landlord_apartments]
