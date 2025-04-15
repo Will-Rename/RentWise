@@ -24,7 +24,29 @@ def create_listing(landlord_id, apartment_name, apartment_location, number_of_un
         return new_apartment
     
 #update_listing
-def update_listing():
+def update_listing(landlord_id, apartment_id, apartment_name=None, apartment_location=None, number_of_units_avaliable=None, number_of_units_not_avaliable=None, apartment_details=None):
+    valid_landlord = Landlord.query.get(landlord_id)
+    valid_apartment = Apartment.query.get(apartment_id)
+
+    if valid_landlord is not valid_apartment.landlord_id:
+        return None
+    else:
+        if apartment_name:
+            valid_apartment.apartment_name = apartment_name
+
+        if apartment_location:
+            valid_apartment.apartment_location = apartment_location
+
+        if number_of_units_avaliable:
+            valid_apartment.number_of_units_avaliable = number_of_units_avaliable
+        
+        if number_of_units_not_avaliable:
+            valid_apartment.number_of_units_not_avaliable = number_of_units_not_avaliable
+
+        if apartment_details:
+            valid_apartment.apartment_details = apartment_details
+
+        db.session.commit()
 
 #delete_listing
 #get_landlord_apartments
