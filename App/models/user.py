@@ -1,13 +1,14 @@
+
 from werkzeug.security import check_password_hash, generate_password_hash
 from App.database import db
 
 class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name =  db.Column(db.String(20), nullable=False, unique=True)
+    name = db.Column(db.String(20), nullable=False, unique=True)
     email = db.Column(db.String(120), nullable=False, unique=True)
     password = db.Column(db.String(120), nullable=False)
     type = db.Column(db.String(50))
-    __mapper_args__ ={
+    __mapper_args__ = {
         'polymorphic_on': type
     }
 
@@ -17,14 +18,16 @@ class User(db.Model):
         self.set_password(password)
 
     def get_json(self):
-        return{
+        return {
             'id': self.id,
-            'username': self.username
+            'name': self.name,
+            'email': self.email,
+            'type': self.type
         }
 
     def set_password(self, password):
         """Create hashed password."""
-        self.password = generate_password_hash(password, method = 'scrypt')
+        self.password = generate_password_hash(password, method='scrypt')
     
     def check_password(self, password):
         """Check hashed password."""
@@ -33,14 +36,6 @@ class User(db.Model):
     def __repr__(self):
         return f'<User {self.name} - {self.email}>'
 
-    def __get_json(self)
-        return{
-            'id': self.id,
-            'name': self.name,
-            'email': self.email
-            'type': self.type
-        }
-
 class Tenant(User):
     __tablename__ = 'tenant'
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
@@ -48,39 +43,39 @@ class Tenant(User):
     reviews = db.relationship('Review', backref='tenant', lazy=True)
 
     __mapper_args__ = {
-        'polymorphic_identity': 'tenant',
+        'polymorphic_identity': 'tenant'
     }
 
     def create_review(self, apartment_id, review_text):
         review = Review(review_text=review_text,
-                        apartment_id=apartment_id,
-                        tenant_id=self.id
-        )
+                       apartment_id=apartment_id,
+                       tenant_id=self.id)
         db.session.add(review)
         db.session.commit()
         return review
 
     def __repr__(self):
-    return f'<Tenant {self.id} : {self.name} - {self.email}>'
+        return f'<Tenant {self.id} : {self.name} - {self.email}>'
 
 class Landlord(User):
     __tablename__ = 'landlord'
     id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
-    phone_number = db.Column(db.String(20), nullable=False, unique=True) # String format of 0 (000) 000-0000.
+    phone_number = db.Column(db.String(20), nullable=False, unique=True)
     apartments = db.relationship('Apartment', backref='landlord', lazy=True)
+    
     __mapper_args__ = {
-        'polymorphic_identity': 'landlord',
+        'polymorphic_identity': 'landlord'
     }
 
     def create_listing(self, name, location, total_units, units_available, apartment_details):
-        apartment = Apartment(apartment_id = self.id
-                              landlord_id=self.id,
-                            apartment_name=name,
-                            apartment_location=location,
-                            number_of_units_total=total_units,
-                            number_of_units_available=units_available,
-                            number_of units_not_available=units_available,
-                            apartment_details=apartment_details
+        apartment = Apartment(
+            landlord_id=self.id,
+            apartment_name=name,
+            apartment_location=location,
+            number_of_units_total=total_units,
+            number_of_units_available=units_available,
+            number_of_units_not_available=total_units - units_available,
+            apartment_details=apartment_details
         )
         db.session.add(apartment)
         db.session.commit()
@@ -95,12 +90,11 @@ class Apartment(db.Model):
     apartment_name = db.Column(db.String(100), nullable=False)
     apartment_location = db.Column(db.String(100), nullable=False)
     landlord_id = db.Column(db.Integer, db.ForeignKey('landlord.id'), nullable=False)
-    number_of_units_total = db.Column(db.Integer, nullable=False) # Total number of units in the apartment.
+    number_of_units_total = db.Column(db.Integer, nullable=False)
     number_of_units_available = db.Column(db.Integer, nullable=False)
     number_of_units_not_available = db.Column(db.Integer, nullable=False)
     apartment_details = db.Column(db.String(200), nullable=False)
 
-    # Relationships
     tenants = db.relationship('Tenant', backref='apartment', lazy=True)
     reviews = db.relationship('Review', backref='apartment', lazy=True)
     amenities = db.relationship('ApartmentAmenity', backref='apartment', lazy=True)
@@ -108,7 +102,7 @@ class Apartment(db.Model):
     def __repr__(self):
         return f'<Apartment {self.id} : {self.apartment_name} - {self.apartment_location}>'
 
-class Amenity(db.Model:
+class Amenity(db.Model):
     __tablename__ = 'amenity'
     id = db.Column(db.Integer, primary_key=True)
     amenity_name = db.Column(db.String(100), nullable=False)
@@ -122,7 +116,7 @@ class ApartmentAmenity(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     apartment_id = db.Column(db.Integer, db.ForeignKey('apartment.id'), nullable=False)
     amenity_id = db.Column(db.Integer, db.ForeignKey('amenity.id'), nullable=False)
-    quantity = db.Column(db.Integer, nullable=False default = 1) # Quantity of the amenity in the apartment.
+    quantity = db.Column(db.Integer, nullable=False, default=1)
 
     def __repr__(self):
         return f'<ApartmentAmenity {self.apartment_id} - {self.amenity_id}: qty = {self.quantity}>'
@@ -136,4 +130,3 @@ class Review(db.Model):
 
     def __repr__(self):
         return f'<Review {self.id} : {self.review_text}>'
-    
