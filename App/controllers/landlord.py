@@ -1,4 +1,4 @@
-from App.models import Landlord 
+from App.models import Landlord, Apartment
 from App.database import db
 
 #create_landlord
@@ -13,6 +13,16 @@ def create_landlord(name, email, password, phone_contact):
 
 
 #create_listing
+def create_listing(landlord_id, apartment_name, apartment_location, number_of_units_avaliable, number_of_units_not_avaliable, apartment_details):
+    valid_landlord = Landlord.query.get(landlord_id)
+    if not valid_landlord:
+        return None
+    else:
+        new_apartment = Apartment(apartment_name=apartment_name, apartment_location=apartment_location, number_of_units_avaliable=number_of_units_avaliable, number_of_units_not_avaliable=number_of_units_not_avaliable, apartment_details=apartment_details)
+        db.session.add(new_apartment)
+        db.session.commit()
+        return new_apartment
+    
 #update_listing
 def update_listing():
 
