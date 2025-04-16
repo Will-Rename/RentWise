@@ -34,3 +34,12 @@ def remove_amenity_from_apartment(apartment_id, amenity_id):
         
 
 #get_apartment_amenities
+def get_apartment_amenities (apartment_id):
+    valid_apartment = Apartment.query.get(apartment_id)
+
+    if not valid_apartment:
+        print("This is nt a valid apartment")
+        return None
+    
+    apartment_amenities = ApartmentAmenities.query.all(apartment_id)
+    return apartment_amenities
