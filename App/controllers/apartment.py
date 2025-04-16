@@ -1,4 +1,4 @@
-from App.models import Apartment, Review
+from App.models import Apartment, Review, ApartmentAmenities
 from App.database import db
 
 #get_apartment
@@ -25,4 +25,13 @@ def get_apartment_reviews(apartment_id):
         apartment_reviews = Review.query.filter_by(apartment_id=apartment_id).all()
         return apartment_reviews
 
-#get_apartment_amenities
+#list_apartment_amenities
+def list_apartment_amenities(apartment_id):
+    valid_apartment = Apartment.query.get(apartment_id)
+
+    if not valid_apartment:
+        print("This is not a valid Apartment")
+        return None
+    else:
+        apartment_amenities = ApartmentAmenities.query.all(apartment_id)
+        return apartment_amenities
