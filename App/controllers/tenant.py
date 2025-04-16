@@ -31,3 +31,20 @@ def get_tenant_reviews(tenant_id):
         tenant_reviews = Review.query.filter_by(tenant_id=tenant_id).all()
         return tenant_reviews
 
+#delete_tenant_review
+def delete_tenant_review(tenant_id, review_id):
+    valid_tenant = Tenant.query.get(tenant_id)
+    valid_review = Review.query.get(review_id)
+
+    if valid_tenant is None:
+        print ("This is not a valid tenant")
+        return None
+
+    if valid_review is None:
+        print ("This is not a valid review")
+        return None
+    
+    if valid_tenant is valid_review.tenant_id:
+        db.session.delete(review_id)
+        db.session.commit()
+        print(f"Tenant {valid_tenant.name} delected review {valid_review}")
