@@ -1,9 +1,9 @@
 from App.models import User, Tenant, Landlord
 from App.database import db
 
-#def create_user(username, password):
-def create_user(name, email, password, type):
+def create_user(name, email, password, type, phone_contact=None):
     if type not in ["tenant", "landlord"]:
+        print(f"This user type {type} is invalid")
         return None
     
     existing_user = User.query.filter_by(email=email).first()
