@@ -1,4 +1,4 @@
-from App.models import Amenities, ApartmentAmenities, Landlord, Apartment
+from App.models import Amenity, ApartmentAmenities, Landlord, Apartment
 from App.database import db
 
 #create_amenity
@@ -8,7 +8,7 @@ def create_amenity(amenity_name, apartment_id, amenity_id):
         print("This amenity is already present")    
         return None
     else:
-        new_amenity = Amenities(amenity_name=amenity_name)
+        new_amenity = Amenity(amenity_name=amenity_name)
         db.session.add(new_amenity)
         db.session.commit()
         print(f"New amenity {new_amenity.namenity_nameame} has been created")
@@ -17,7 +17,7 @@ def create_amenity(amenity_name, apartment_id, amenity_id):
 #delete_amenity
 def delete_amenity(landlord_id, amenity_id, apartment_id):
     valid_landlord = Landlord.query.get(landlord_id)
-    valid_amenity = Amenities.query.get(amenity_id)
+    valid_amenity = Amenity.query.get(amenity_id)
     valid_apartment= Apartment.query.get(apartment_id)
 
     if not valid_apartment:
@@ -49,11 +49,11 @@ def delete_amenity(landlord_id, amenity_id, apartment_id):
 
 #get_all_amenities
 def get_all_amenities():
-    list_of_amenities = Amenities.query.all()
+    list_of_amenities = Amenity.query.all()
     return list_of_amenities
 
 #get_amenity
 def get_amenity(amenity_id):
-    amenity = Amenities.query.get(amenity_id)
+    amenity = Amenity.query.get(amenity_id)
     print("Amenity was found")
     return amenity
