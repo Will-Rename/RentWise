@@ -2,7 +2,7 @@ from App.models import ApartmentAmenities, Apartment, Amenity
 from App.database import db
 
 #add_amenity_to_apartment
-def add_amenity_to_apartment(apartment_id, quantity, amenity_id, amenity_name):
+def add_amenity_to_apartment(apartment_id, quantity, amenity_id):
     valid_apartment = Apartment.query.get(apartment_id)
 
     if not valid_apartment:
@@ -21,5 +21,16 @@ def add_amenity_to_apartment(apartment_id, quantity, amenity_id, amenity_name):
     return new_apartment_amenity
 
 #remove_amenity_from_apartment
+def remove_amenity_from_apartment(apartment_id, amenity_id):
+    valid_apartment_amenity = ApartmentAmenities.query.filter_by(apartment_id=apartment_id, amenity_id=amenity_id).first()
+
+    if not valid_apartment_amenity:
+        print ("This is Apartment does not have this amenity")
+        return None
+    else:
+        db.session.delete(valid_apartment_amenity)
+        db.session.commit()
+        print(f"Amenity {amenity_id.amenity_name} has been removed from apartment {apartment_id.apartment_name}")
+        
 
 #get_apartment_amenities
