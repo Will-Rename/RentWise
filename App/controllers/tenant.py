@@ -14,7 +14,7 @@ def create_tenant(name, email, password, apartment_id):
 
 #create_review
 def create_review(tenant_id, apartment_id, review):
-    if Tenant.query.get(tenant_id).first(): 
+    if Tenant.query.get(tenant_id): 
         return None
     else:
         new_review= Review(tenant_id, apartment_id, review)
@@ -25,8 +25,9 @@ def create_review(tenant_id, apartment_id, review):
 
 #get_tenant_reviews
 def get_tenant_reviews(tenant_id):
-    if Tenant.query.get(tenant_id).first(): 
+    if Tenant.query.get(tenant_id): 
         return None
     else:
         tenant_reviews = Review.query.filter_by(tenant_id=tenant_id).all()
-        return [review.get_json() for review in tenant_reviews]
+        return tenant_reviews
+

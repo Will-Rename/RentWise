@@ -72,4 +72,4 @@ def get_landlord_apartments(landlord_id):
         return None
     else:
         landlord_apartments = Apartment.query.filter_by(landlord_id=landlord_id).all()
-        return [apartment.get_json() for apartment in landlord_apartments]
+        return landlord_apartments
