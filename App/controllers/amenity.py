@@ -48,5 +48,8 @@ def delete_amenity(landlord_id, amenity_id, apartment_id):
 
 
 #get_all_amenities
+def get_all_amenities():
+    list_of_amenities = Amenities.query.all()
+    return list_of_amenities
 
 #get_amenity
