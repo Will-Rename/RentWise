@@ -53,3 +53,7 @@ def get_all_amenities():
     return list_of_amenities
 
 #get_amenity
+def get_amenity(amenity_id):
+    amenity = Amenities.query.get(amenity_id)
+    print("Amenity was found")
+    return amenity
