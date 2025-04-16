@@ -24,4 +24,9 @@ def create_review(tenant_id, apartment_id, review):
         return new_review
 
 #get_tenant_reviews
-def get_tenant_reviews(tenant_id)
+def get_tenant_reviews(tenant_id):
+    if Tenant.query.get(tenant_id).first(): 
+        return None
+    else:
+        tenant_reviews = Review.query.filter_by(tenant_id=tenant_id).all()
+        return [review.get_json() for review in tenant_reviews]
