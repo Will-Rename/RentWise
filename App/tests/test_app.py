@@ -3,7 +3,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 from App.main import create_app
 from App.database import db, create_db
-from App.models import User
+from App.models import User, Tenant, Landlord, Apartment, Amenity, ApartmentAmenity, Review
 from App.controllers import (
     create_user,
     get_all_users_json,
@@ -41,6 +41,22 @@ class UserUnitTests(unittest.TestCase):
         password = "mypass"
         user = User("bob", password)
         assert user.check_password(password)
+
+
+    
+class ApartmentUnitTests(unittest.TestCase):
+
+    def test_new_apartment(self):
+        self.landlord = Landlord(
+            name='John',
+            email='landlord@mail.com',
+            password='password',
+            phone_number='(868) 123-4567'
+        )
+        db.session.add(self.landlord)
+        db.session.commit()
+
+
 
 '''
     Integration Tests
