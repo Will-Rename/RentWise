@@ -40,7 +40,7 @@ def get_apartments(location=None, amenity=None):
 
     list_of_found_apartments = []
     for apartments in found:
-        list_of_found_apartments.append= ({
+        list_of_found_apartments.append({
         "apartment_id": apartments.apartment_id,
         "apartment_name": apartments.apartment_name,
         "apartment_location": apartments.apartment_location,

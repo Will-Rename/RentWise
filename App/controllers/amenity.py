@@ -12,7 +12,7 @@ def create_amenity(amenity_name):
     new_amenity = Amenity(amenity_name=amenity_name)
     db.session.add(new_amenity)
     db.session.commit()
-    print(f"New amenity {new_amenity.namenity_nameame} has been created")
+    print(f"New amenity {new_amenity.amenity_name} has been created")
     return new_amenity
 
 #delete_amenity
@@ -31,7 +31,15 @@ def delete_amenity(amenity_id):
 #get_all_amenities
 def get_all_amenities():
     list_of_amenities = Amenity.query.all()
-    return list_of_amenities
+
+    amenities= [
+        {
+            "amenity_id": amenity.amenity_id,
+            "amenity_name": amenity.amenity_name,
+        }
+        for amenity in list_of_amenities
+    ]
+    return amenities
 
 #get_amenity
 def get_amenity(amenity_id):
