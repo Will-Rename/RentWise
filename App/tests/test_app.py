@@ -22,14 +22,14 @@ LOGGER = logging.getLogger(__name__)
 class UserUnitTests(unittest.TestCase):
 
     def test_new_user(self):
-        user = User("bob", "bobpass")
+        user = User(name="bob", email="bob@mail.com", password="bobpass")
         assert user.username == "bob"
 
     # pure function no side effects or integrations called
     def test_get_json(self):
         user = User("bob", "bobpass")
         user_json = user.get_json()
-        self.assertDictEqual(user_json, {"id":None, "username":"bob"})
+        self.assertDictEqual(user_json, {"id":None, "name":"bob"})
     
     def test_hashed_password(self):
         password = "mypass"
