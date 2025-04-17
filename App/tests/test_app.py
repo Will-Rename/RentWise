@@ -93,6 +93,19 @@ class ApartmentUnitTests(unittest.TestCase):
 
 
 
+class TenantUnitTests(unittest.TestCase):
+
+    def create_test_tenants(self):
+
+        self.landlord = Landlord(
+            name='John',
+            email='landlord@mail.com',
+            password='password',
+            phone_number='(868) 123-4567'
+        )
+        db.session.add(self.landlord)
+
+
 '''
     Integration Tests
 '''
