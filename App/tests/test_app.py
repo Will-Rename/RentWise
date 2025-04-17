@@ -105,6 +105,36 @@ class TenantUnitTests(unittest.TestCase):
         )
         db.session.add(self.landlord)
 
+        self.landlord = Landlord(
+            name='John',
+            email='landlord@mail.com',
+            password='password',
+            phone_number='(868) 123-4567'
+        )
+        db.session.add(self.landlord)
+
+        self.apartment = Apartment(
+            apartment_name='Test_Apartment',
+            apartment_location='Test_Location',
+            landlord_id=self.landlord.id,
+            number_of_units_total=10,
+            number_of_units_available=9,
+            number_of_units_not_available=1,
+            apartment_details='Test_Details'
+        )
+        db.session.add(self.apartment)
+        db.session.commit()
+
+        tenant = Tenant(
+            name='Jane Doe',
+            email='jane@mail.com',
+            password='password',
+            apartment_id=self.apartment.id
+        )
+        db.session.add(tenant)
+        db.session.commit()
+
+
 
 '''
     Integration Tests
