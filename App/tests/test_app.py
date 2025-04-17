@@ -56,6 +56,41 @@ class ApartmentUnitTests(unittest.TestCase):
         db.session.add(self.landlord)
         db.session.commit()
 
+    def test_new_apartment(self):
+        apartment = Apartment(
+            apartment_name='Test_Apartment',
+            apartment_location='Test_Location',
+            landlord_id=self.landlord.id,
+            number_of_units_total=10,
+            number_of_units_available=5,
+            number_of_units_not_available=5,
+            apartment_details='Test_Details'
+        )
+        db.session.add(apartment)
+        db.session.commit()
+
+        assert apartment.apartment_name == "Test_Apartment"
+        assert apartment.landlord_id == self.landlord.id
+        assert apartment.number_of_units_total == 10
+        assert apartment.landlord == self.landlord
+
+
+    def test_apartment_units_logic(self):
+        """Test unit availability logic"""
+        apartment = Apartment(
+            apartment_name='Test_Apartment',
+            apartment_location='Test_Location',
+            landlord_id=self.landlord.id,
+            number_of_units_total=15,
+            number_of_units_available=10,
+            number_of_units_not_available=5,
+            apartment_details='Test_Details'
+        )
+        db.session.add(apartment)
+        db.session.commit()
+
+        assert apartment.number_of_units_total == apartment.number_of_units_available + apartment.number_of_units_not_available
+
 
 
 '''
