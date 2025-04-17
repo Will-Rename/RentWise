@@ -153,6 +153,14 @@ class TenantUnitTests(unittest.TestCase):
         )
         db.session.add(tenant)
         db.session.commit()
+       
+        tenant_json = tenant.get_json()
+        
+        assert tenant_json['id'] == tenant.id
+        assert tenant_json['name'] == 'Jason'
+        assert tenant_json['email'] == 'json@mail.com'
+        assert tenant_json['type'] == 'tenant'
+        assert tenant_json['apartment_id'] == self.apartment.id
 
 
 
