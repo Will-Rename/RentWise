@@ -1,4 +1,5 @@
-from App.models import User, Landlord, Apartment
+from App.models import User, Landlord, Apartment, Amenity
+from App.controllers import add_amenity_to_apartment
 from App.database import db
 
 #create_landlord
@@ -13,8 +14,8 @@ def create_landlord(name, email, password, phone_contact):
         print(f"Landlord {new_landlord.name} has been created")
         return new_landlord
 
-#create_listing
-def create_listing(landlord_id, apartment_name, apartment_location, number_of_units_avaliable, number_of_units_not_avaliable, apartment_details):
+#create_listing with amenities and details - application main feature 1
+def create_listing(landlord_id, apartment_name, apartment_location, number_of_units_avaliable, number_of_units_not_avaliable, apartment_details, amenities_quantity):
     valid_landlord = Landlord.query.get(landlord_id)
     
     if not valid_landlord:
@@ -25,6 +26,19 @@ def create_listing(landlord_id, apartment_name, apartment_location, number_of_un
     db.session.add(new_apartment)
     db.session.commit()
     print(f"Apartment Listing for {new_apartment.apartment_name} has been created")
+
+    for amenity in amenities_quantity:
+        amenity_name = amenity.get("amenity_name")
+        quantity = amenity.get("quantity", 1)
+
+        existing_amenity= Amenity.query.filter_by(amenity_name=amenity_name).first()
+
+        if not existing_amenity:
+            print(f"The amenity {amenity_name} does not currently exist")
+            continue
+
+        add_amenity_to_apartment(apartment_id=new_apartment.apartment_id, quantity=quantity, amenity_id=existing_amenity.amenity_id, landlord_id=landlord_id)
+
     return new_apartment
     
     

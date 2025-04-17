@@ -13,7 +13,7 @@ def create_tenant(name, email, password, apartment_id):
         print(f"Tenant {new_tenant.name} has been created")
         return new_tenant
 
-#create_review
+#create_review - application main feature 2
 def create_review(tenant_id, apartment_id, review):
     valid_tenant= Tenant.query.get(tenant_id)
 
