@@ -143,7 +143,16 @@ class TenantUnitTests(unittest.TestCase):
         assert self.apartment.number_of_units_available == 8
         assert self.apartment.number_of_units_not_available == 2
 
-
+    def test_tenant_json(self):
+        #Test tenant get_json
+        tenant = Tenant(
+            name='Jason',
+            email='json@mail.com',
+            password='password',
+            apartment_id=self.apartment.id
+        )
+        db.session.add(tenant)
+        db.session.commit()
 
 
 
