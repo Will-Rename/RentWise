@@ -140,6 +140,11 @@ class TenantUnitTests(unittest.TestCase):
         assert tenant.apartment_id, self.apartment.id
         assert tenant.apartment == self.apartment
 
+        assert self.apartment.number_of_units_available == 8
+        assert self.apartment.number_of_units_not_available == 2
+
+
+
 
 
 '''
