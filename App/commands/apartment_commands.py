@@ -1,5 +1,5 @@
 import click
-from models import db, Apartment, Landlord
+from models import db, Apartment, Landlord, Amenity, ApartmentAmenity
 from app import app
 
 @app.cli.command("create-apartment")
@@ -10,7 +10,7 @@ from app import app
 @click.option('--description', prompt=True, help="Apartment description")
 def create_apartment(default, address, rent, landlord_id, description):
     """Creates a new apartment listing."""
-    if default:
+    if default:  
         address = "123 Main St"
         rent = 1200.00
         # Get the first landlord in the system
@@ -80,3 +80,55 @@ def delete_apartment(apartment_id):
     db.session.delete(apartment)
     db.session.commit()
     click.echo(f"Apartment at '{address}' has been deleted.")
+
+@app.cli.command("search-apartments")
+@click.option('--location', help="Search by location")
+@click.option('--amenity', help="Search by amenity name")
+def search_apartments(location, amenity):
+    """Search for apartments by location and/or amenity."""
+    if not location and not amenity:
+        click.echo("Please provide either location or amenity to search.")
+        return
+
+    found = []
+    if location and not amenity:
+        click.echo(f"Searching for apartments in {location}")
+        found = Apartment.query.filter_by(address=location).all()
+    
+    elif amenity and not location:
+        click.echo(f"Searching for apartments with {amenity}")
+        amenity_obj = Amenity.query.filter_by(name=amenity).first()
+        if not amenity_obj:
+            click.echo(f"Amenity '{amenity}' not found.")
+            return
+        
+        found = Apartment.query.join(ApartmentAmenity).\
+            filter(ApartmentAmenity.amenity_id == amenity_obj.id).all()
+    
+    elif location and amenity:
+        click.echo(f"Searching for apartments in {location} with {amenity}")
+        amenity_obj = Amenity.query.filter_by(name=amenity).first()
+        if not amenity_obj:
+            click.echo(f"Amenity '{amenity}' not found.")
+            return
+            
+        found = Apartment.query.join(ApartmentAmenity).\
+            filter(Apartment.address == location).\
+            filter(ApartmentAmenity.amenity_id == amenity_obj.id).all()
+
+    if not found:
+        click.echo("No apartments found matching your criteria.")
+        return
+
+    for apt in found:
+        click.echo(f"\nID: {apt.id}")
+        click.echo(f"Address: {apt.address}")
+        click.echo(f"Rent: ${apt.rent:.2f}")
+        click.echo(f"Description: {apt.description}")
+        amenities = Amenity.query.join(ApartmentAmenity).\
+            filter(ApartmentAmenity.apartment_id == apt.id).all()
+        if amenities:
+            click.echo("Amenities:")
+            for amenity in amenities:
+                click.echo(f"  - {amenity.name}")
+        click.echo("---")

@@ -49,7 +49,7 @@ def init_db(default):
         
         tenant = Tenant(
             user_id=tenant_user.id,
-            phone="555-0200"
+            phone="678-0200"
         )
         db.session.add(tenant)
         
@@ -107,7 +107,7 @@ def reset_db(default):
     """Reset the database and optionally add default test data (WARNING: This will delete all data)."""
     db.drop_all()
     db.create_all()
-    
+      
     if default:
         init_db(default=True)
     else:

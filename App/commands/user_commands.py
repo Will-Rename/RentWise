@@ -2,7 +2,7 @@ import click
 from models import db, User
 from app import app
 from werkzeug.security import generate_password_hash
-
+ 
 @app.cli.command("create-user")
 @click.option('--default', is_flag=True, help="Create a default test user")
 @click.option('--username', prompt=True, help="User's username")
@@ -10,7 +10,7 @@ from werkzeug.security import generate_password_hash
 @click.option('--password', prompt=True, hide_input=True, confirmation_prompt=True, help="User's password")
 def create_user(default, username, email, password):
     """Creates a new user: prompted OR default test user."""
-    if default:
+    if default:  
         username = "testuser"
         email = "test@rentwise.com"
         password = "test123"

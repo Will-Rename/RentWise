@@ -8,7 +8,7 @@ from app import app
 @click.option('--description', prompt=True, help="Amenity description")
 def create_amenity(default, name, description):
     """Creates a new amenity or default amenities."""
-    if default:
+    if default:  
         default_amenities = [
             ("Parking", "Reserved parking spot"),
             ("Pool", "Access to swimming pool"),

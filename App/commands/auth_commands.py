@@ -16,7 +16,7 @@ def create_admin(default, username, email, password):
         email = "admin@rentwise.com"
         password = "admin123"
         click.echo("Creating default admin user...")
-
+  
     hashed_password = generate_password_hash(password)
     admin = User(username=username, email=email, password=hashed_password, is_admin=True)
     db.session.add(admin)

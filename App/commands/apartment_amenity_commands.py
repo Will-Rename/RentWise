@@ -11,7 +11,7 @@ def add_apartment_amenity(default, apartment_id, amenity_id):
     apartment = Apartment.query.get(apartment_id)
     if not apartment:
         click.echo("Apartment not found.")
-        return
+        return  
 
     if default:
         # Add a standard set of amenities (first 3 available amenities)

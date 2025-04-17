@@ -9,7 +9,7 @@ from werkzeug.security import generate_password_hash
 @click.option('--phone', prompt=True, help="Contact phone number")
 def create_landlord(default, user_id, phone):
     """Creates a new landlord profile."""
-    if default:
+    if default:  
         # Create a default user first
         default_user = User(
             username="landlord",
