@@ -134,6 +134,12 @@ class TenantUnitTests(unittest.TestCase):
         db.session.add(tenant)
         db.session.commit()
 
+        assert tenant.name  == 'Jane Doe'
+        assert tenant.email == 'jane@mail.com'
+        assert tenant.check_password('password') == 'password'
+        assert tenant.apartment_id, self.apartment.id
+        assert tenant.apartment == self.apartment
+
 
 
 '''
