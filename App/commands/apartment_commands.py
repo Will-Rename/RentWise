@@ -35,6 +35,7 @@ def create_apartment(default, address, rent, landlord_id, description):
 @app.cli.command("list-apartments")
 @click.option('--landlord-id', type=int, help="Filter by landlord ID")
 def list_apartments(landlord_id):
+
     """List all apartments, optionally filtered by landlord."""
     query = Apartment.query
     if landlord_id:
