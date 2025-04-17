@@ -1,4 +1,4 @@
-from App.models import Amenity, ApartmentAmenities, Landlord, Apartment
+from App.models import Amenity
 from App.database import db
 
 #create_amenity
