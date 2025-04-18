@@ -2,24 +2,27 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from App.database import db
 
 class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name =  db.Column(db.String(20), nullable=False, unique=True)
+    user_id = db.Column(db.Integer, primary_key=True)
+    name =  db.Column(db.String(120), nullable=False)
     email = db.Column(db.String(120), nullable=False, unique=True)
     password = db.Column(db.String(120), nullable=False)
     type = db.Column(db.String(50))
     __mapper_args__ ={
-        'polymorphic_on': type
+        'polymorphic_identity': "user",
     }
 
-    def __init__(self, name, email, password):
+    def __init__(self, name, email, password, type):
         self.name = name
         self.email = email
         self.set_password(password)
+        self.type= type
 
     def get_json(self):
         return{
-            'id': self.id,
-            'username': self.username
+            'user_id': self.user_id,
+            'username': self.name,
+            "email": self.email,
+            "type": self.type
         }
 
     def set_password(self, password):
@@ -29,10 +32,11 @@ class User(db.Model):
     def check_password(self, password):
         """Check hashed password."""
         return check_password_hash(self.password, password)
-
+    
     def __repr__(self):
-        return f'<User {self.name} - {self.email}>'
+        return f'<User name: {self.name} email: {self.email} type: {self.type}>'
 
+    '''
     def __get_json(self):
         return{
             'id': self.id,
@@ -40,6 +44,7 @@ class User(db.Model):
             'email': self.email,
             'type': self.type
         }
+    '''
 
 class Tenant(User):
     __tablename__ = 'tenant'
