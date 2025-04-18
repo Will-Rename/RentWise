@@ -2,6 +2,7 @@ from werkzeug.security import check_password_hash, generate_password_hash
 from App.database import db
 
 class User(db.Model):
+    __tablename__= "user"
     user_id = db.Column(db.Integer, primary_key=True)
     name =  db.Column(db.String(120), nullable=False)
     email = db.Column(db.String(120), nullable=False, unique=True)
@@ -48,14 +49,18 @@ class User(db.Model):
 
 class Tenant(User):
     __tablename__ = 'tenant'
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
-    apartment_id = db.Column(db.Integer, db.ForeignKey('apartment.id'), nullable=False)
+    tenant_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), primary_key=True)
+    apartment_id = db.Column(db.Integer, db.ForeignKey('apartment.apartment_id'), nullable=False)
+    
+    #Relationships
     reviews = db.relationship('Review', backref='tenant', lazy=True)
-
+    apartment= db.relationship('Apartment', backref='tenant', lazy=True)
+    
     __mapper_args__ = {
-        'polymorphic_identity': 'tenant',
+        'polymorphic_identity': 'tenant'
     }
-
+    
+    '''
     def create_review(self, apartment_id, review_text):
         review = Review(review_text=review_text,
                         apartment_id=apartment_id,
@@ -64,9 +69,15 @@ class Tenant(User):
         db.session.add(review)
         db.session.commit()
         return review
+    '''
 
+    def __init__(self, name, email, password):
+        super().__init__(name, email, password, type="tenant")
+
+    '''
     def __repr__(self):
         return f'<Tenant {self.id} : {self.name} - {self.email}>'
+    '''
 
 class Landlord(User):
     __tablename__ = 'landlord'
