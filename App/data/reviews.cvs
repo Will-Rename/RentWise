@@ -1,0 +1,4 @@
+id,review_text,apartment_id,tenant_id
+1,"Great apartment with excellent WiFi",1,4
+2,"Parking space is too small",2,5
+3,"Nice gym facility",3,4
