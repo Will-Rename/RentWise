@@ -20,7 +20,9 @@ from App.controllers import (
     create_review,
     get_tenant_reviews,
     get_apartment_reviews,
-    delete_tenant_review
+    delete_tenant_review,
+    delete_amenity,
+    get_amenity
 )
 
 app = create_app()
@@ -114,16 +116,20 @@ Amenity Commands
 amenity_cli = AppGroup('amenity', help='Amenity management commands')
 
 @amenity_cli.command("create", help="Creates a new amenity")
-@click.option('--default', is_flag=True, help="Create default amenities")
 @click.option('--name', prompt=True, help="Amenity name")
-def create_amenity_command(default, name):
+@click.option('--default', is_flag=True, help="Create default amenities")
+def create_amenity_command(name, default):
     if default:
         default_amenities = [
             "Parking",
-            "Pool",
+            "Pool", 
             "Gym",
             "WiFi",
-            "Security"
+            "Security",
+            "Air Conditioning",
+            "Laundry",
+            "Pet Friendly",
+            "Furnished"
         ]
         for amenity_name in default_amenities:
             amenity = create_amenity(amenity_name)
@@ -135,7 +141,7 @@ def create_amenity_command(default, name):
     if amenity:
         print(f"Amenity '{name}' created successfully.")
     else:
-        print("Failed to create amenity.")
+        print("Failed to create amenity - amenity may already exist.")
 
 @amenity_cli.command("list", help="Lists all amenities")
 def list_amenities_command():
@@ -146,6 +152,25 @@ def list_amenities_command():
     
     for amenity in amenities:
         print(f"ID: {amenity['amenity_id']}, Name: {amenity['amenity_name']}")
+
+@amenity_cli.command("delete", help="Delete an amenity")
+@click.option('--id', type=int, prompt=True, help="Amenity ID")
+def delete_amenity_command(id):
+    result = delete_amenity(id)
+    if result is not None:
+        print(f"Amenity deleted successfully.")
+    else:
+        print("Failed to delete amenity - amenity may not exist.")
+
+@amenity_cli.command("get", help="Get amenity details")
+@click.option('--id', type=int, prompt=True, help="Amenity ID")
+def get_amenity_command(id):
+    amenity = get_amenity(id)
+    if amenity:
+        print(f"ID: {amenity.id}")
+        print(f"Name: {amenity.amenity_name}")
+    else:
+        print("Amenity not found.")
 
 app.cli.add_command(amenity_cli)
 
