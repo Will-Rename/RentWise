@@ -146,6 +146,14 @@ class Apartment(db.Model):
     apartment_amenities = db.relationship('ApartmentAmenity', backref='apartment', lazy=True)
     landlord= db.relationship("Landlord", backref="apartment", lazy=True)
 
+    def __init__ (self, apartment_name, apartment_location, landlord_id, number_of_units_available, number_of_units_not_available, apartment_details):
+        self.apartment_name = apartment_name
+        self.apartment_location = apartment_location
+        self.landlord_id = landlord_id #not too sure about this part
+        self.number_of_units_available = number_of_units_available
+        self.number_of_units_not_available = number_of_units_not_available
+        self.apartment_details = apartment_details
+
     def __repr__(self):
         return f'<Apartment {self.id} : {self.apartment_name} - {self.apartment_location} Number of units avaliable {self.number_of_units_available}>'
 
@@ -164,7 +172,10 @@ class Amenity(db.Model):
     amenity_name = db.Column(db.String(100), nullable=False)
     
     #Relationship
-    amenity_apartment = db.relationship('ApartmentAmenity', backref="amenity_apartment", lazy=True)
+    amenity_apartment = db.relationship('ApartmentAmenity', backref="amenity", lazy=True)
+
+    def __init__ (self, amenity_name):
+        self.amenity_name = amenity_name
 
     def __repr__(self):
         return f'<Amenity {self.id} : {self.amenity_name}>'
@@ -172,13 +183,19 @@ class Amenity(db.Model):
 
 class ApartmentAmenity(db.Model):
     __tablename__ = 'apartment_amenity'
-    id = db.Column(db.Integer, primary_key=True)
-    apartment_id = db.Column(db.Integer, db.ForeignKey('apartment.id'), nullable=False)
-    amenity_id = db.Column(db.Integer, db.ForeignKey('amenity.id'), nullable=False)
+    #id = db.Column(db.Integer, primary_key=True)
+    #Composite Key
+    apartment_id = db.Column(db.Integer, db.ForeignKey('apartment.apartment_id'), primary_key=True)
+    amenity_id = db.Column(db.Integer, db.ForeignKey('amenity.amenity_id'), primary_key=True)
     quantity = db.Column(db.Integer, nullable=False, default = 1) # Quantity of the amenity in the apartment.
 
+    #Relationships
+    apartment= db.relationship("Apartment", backref="amenity_apartment", lazy=True)
+    amenity= db.relationship('ApartmentAmenity', backref="amenity_apartment", lazy=True)
+
     def __repr__(self):
-        return f'<ApartmentAmenity {self.apartment_id} - {self.amenity_id}: qty = {self.quantity}>'
+        return f'<ApartmentAmenity {self.apartment_id} - {self.amenity_id} Quantity = {self.quantity}>'
+
 
 class Review(db.Model):
     __tablename__ = 'review'
