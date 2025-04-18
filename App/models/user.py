@@ -22,7 +22,7 @@ class User(db.Model):
     def get_json(self):
         return{
             'user_id': self.user_id,
-            'username': self.name,
+            'name': self.name,
             "email": self.email,
             "type": self.type
         }
@@ -75,6 +75,13 @@ class Tenant(User):
     def __init__(self, name, email, password):
         super().__init__(name, email, password, type="tenant")
 
+    def get_json(self):
+        return{
+            'tenant_id': self.tenant_id,
+            'name': self.name,
+            "email": self.email,
+            "type": self.type
+        }
     
     def __repr__(self):
         return f'<Tenant {self.id} : {self.name} - {self.email}>'
@@ -110,16 +117,25 @@ class Landlord(User):
     def __init__(self, name, email, password):
         super().__init__(name, email, password, type="landlord")
 
+    def get_json(self):
+        return{
+            'landlord_id': self.landlord_id,
+            'name': self.name,
+            "email": self.email,
+            "type": self.type
+        }
+    
     def __repr__(self):
         return f'<Landlord {self.id} : {self.name} - {self.email}>'
 
+
 class Apartment(db.Model):
     __tablename__ = 'apartment'
-    id = db.Column(db.Integer, primary_key=True)
+    apartment_id = db.Column(db.Integer, primary_key=True)
     apartment_name = db.Column(db.String(100), nullable=False)
     apartment_location = db.Column(db.String(100), nullable=False)
-    landlord_id = db.Column(db.Integer, db.ForeignKey('landlord.id'), nullable=False)
-    number_of_units_total = db.Column(db.Integer, nullable=False) # Total number of units in the apartment.
+    landlord_id = db.Column(db.Integer, db.ForeignKey('landlord.landlord_id'), nullable=False)
+    #number_of_units_total = db.Column(db.Integer, nullable=False) # Total number of units in the apartment.
     number_of_units_available = db.Column(db.Integer, nullable=False)
     number_of_units_not_available = db.Column(db.Integer, nullable=False)
     apartment_details = db.Column(db.String(200), nullable=False)
@@ -127,19 +143,32 @@ class Apartment(db.Model):
     # Relationships
     tenants = db.relationship('Tenant', backref='apartment', lazy=True)
     reviews = db.relationship('Review', backref='apartment', lazy=True)
-    amenities = db.relationship('ApartmentAmenity', backref='apartment', lazy=True)
+    apartment_amenities = db.relationship('ApartmentAmenity', backref='apartment', lazy=True)
+    landlord= db.relationship("Landlord", backref="apartment", lazy=True)
 
     def __repr__(self):
-        return f'<Apartment {self.id} : {self.apartment_name} - {self.apartment_location}>'
+        return f'<Apartment {self.id} : {self.apartment_name} - {self.apartment_location} Number of units avaliable {self.number_of_units_available}>'
 
+    def get_json(self):
+        return{
+            'apartment_id': self.apartment_id,
+            'apartment_name': self.apartment_name,
+            "apartment_location": self.apartment_location,
+            "number_of_units_available": self.number_of_units_available,
+            "apartment_details": self.apartment_details
+        }
+    
 class Amenity(db.Model):
     __tablename__ = 'amenity'
-    id = db.Column(db.Integer, primary_key=True)
+    amenity_id = db.Column(db.Integer, primary_key=True)
     amenity_name = db.Column(db.String(100), nullable=False)
-    apartment_amenities = db.relationship('ApartmentAmenity', backref='amenity', lazy=True)
+    
+    #Relationship
+    amenity_apartment = db.relationship('ApartmentAmenity', backref="amenity_apartment", lazy=True)
 
     def __repr__(self):
         return f'<Amenity {self.id} : {self.amenity_name}>'
+    
 
 class ApartmentAmenity(db.Model):
     __tablename__ = 'apartment_amenity'
