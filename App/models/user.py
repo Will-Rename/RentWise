@@ -11,6 +11,7 @@ class User(db.Model):
     
     __mapper_args__ ={
         'polymorphic_identity': "user",
+        "polymorphic_on": type
     }
 
     def __init__(self, name, email, password, type):
@@ -84,7 +85,7 @@ class Tenant(User):
         }
     
     def __repr__(self):
-        return f'<Tenant {self.id} : {self.name} - {self.email}>'
+        return f'<Tenant {self.tenant_id} : {self.name} - {self.email}>'
     
 
 class Landlord(User):
@@ -114,19 +115,21 @@ class Landlord(User):
         db.session.commit()
         return apartment
     '''
-    def __init__(self, name, email, password):
+    def __init__(self, name, email, password, phone_number):
         super().__init__(name, email, password, type="landlord")
+        self.phone_number= phone_number
 
     def get_json(self):
         return{
             'landlord_id': self.landlord_id,
             'name': self.name,
             "email": self.email,
+            "phone_number": self.phone_number,
             "type": self.type
         }
     
     def __repr__(self):
-        return f'<Landlord {self.id} : {self.name} - {self.email}>'
+        return f'<Landlord {self.landlord_id} : {self.name} - {self.email} {self.phone_number}>'
 
 
 class Apartment(db.Model):
@@ -141,10 +144,10 @@ class Apartment(db.Model):
     apartment_details = db.Column(db.String(200), nullable=False)
 
     # Relationships
-    tenants = db.relationship('Tenant', backref='apartment', lazy=True)
+    #tenants = db.relationship('Tenant', backref='apartment', lazy=True)
     reviews = db.relationship('Review', backref='apartment', lazy=True)
     apartment_amenities = db.relationship('ApartmentAmenity', backref='apartment', lazy=True)
-    landlord= db.relationship("Landlord", backref="apartment", lazy=True)
+    #landlord= db.relationship("Landlord", backref="apartment", lazy=True)
 
     def __init__ (self, apartment_name, apartment_location, landlord_id, number_of_units_available, number_of_units_not_available, apartment_details):
         self.apartment_name = apartment_name
@@ -155,7 +158,7 @@ class Apartment(db.Model):
         self.apartment_details = apartment_details
 
     def __repr__(self):
-        return f'<Apartment {self.id} : {self.apartment_name} - {self.apartment_location} Number of units avaliable {self.number_of_units_available}>'
+        return f'<Apartment {self.apartment_id} : {self.apartment_name} - {self.apartment_location} Number of units avaliable {self.number_of_units_available}>'
 
     def get_json(self):
         return{
@@ -178,7 +181,7 @@ class Amenity(db.Model):
         self.amenity_name = amenity_name
 
     def __repr__(self):
-        return f'<Amenity {self.id} : {self.amenity_name}>'
+        return f'<Amenity {self.amenity_id} : {self.amenity_name}>'
     
 
 class ApartmentAmenity(db.Model):
@@ -190,8 +193,8 @@ class ApartmentAmenity(db.Model):
     quantity = db.Column(db.Integer, nullable=False, default = 1) # Quantity of the amenity in the apartment.
 
     #Relationships
-    apartment= db.relationship("Apartment", backref="amenity_apartment", lazy=True)
-    amenity= db.relationship('ApartmentAmenity', backref="amenity_apartment", lazy=True)
+    #amenity_apartment= db.relationship("Apartment", backref="amenity", lazy=True)
+    #apartment_amenities= db.relationship('ApartmentAmenity', backref="apartment", lazy=True)
 
     def __repr__(self):
         return f'<ApartmentAmenity {self.apartment_id} - {self.amenity_id} Quantity = {self.quantity}>'
@@ -217,5 +220,5 @@ class Review(db.Model):
         }
     
     def __repr__(self):
-        return f'<Review {self.id} : {self.review_text}>'
+        return f'<Review {self.review_id} : {self.review_text}>'
     
