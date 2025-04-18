@@ -1,11 +1,25 @@
-from App.models import User
+from App.models import User, Tenant, Landlord
 from App.database import db
 
-def create_user(username, password):
-    newuser = User(username=username, password=password)
-    db.session.add(newuser)
+def create_user(name, email, password, type, phone_contact=None):
+    if type not in ["tenant", "landlord"]:
+        print(f"This user type {type} is invalid")
+        return None
+    
+    existing_user = User.query.filter_by(email=email).first()
+
+    if existing_user:
+        print("This user already exist")
+        return None
+    
+    if type == "tenant":
+        new_user = Tenant(name=name, email=email, password=password)
+    elif type == "landlord":
+        new_user = Landlord(name=name, email=email, password=password, phone_contact=phone_contact)
+    
+    db.session.add(new_user)
     db.session.commit()
-    return newuser
+    return new_user
 
 def get_user_by_username(username):
     return User.query.filter_by(username=username).first()
