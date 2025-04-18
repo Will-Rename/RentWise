@@ -8,6 +8,7 @@ class User(db.Model):
     email = db.Column(db.String(120), nullable=False, unique=True)
     password = db.Column(db.String(120), nullable=False)
     type = db.Column(db.String(50))
+    
     __mapper_args__ ={
         'polymorphic_identity': "user",
     }
@@ -74,20 +75,24 @@ class Tenant(User):
     def __init__(self, name, email, password):
         super().__init__(name, email, password, type="tenant")
 
-    '''
+    
     def __repr__(self):
         return f'<Tenant {self.id} : {self.name} - {self.email}>'
-    '''
+    
 
 class Landlord(User):
     __tablename__ = 'landlord'
-    id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    landlord_id = db.Column(db.Integer, db.ForeignKey('user.user_id'), primary_key=True)
     phone_number = db.Column(db.String(20), nullable=False, unique=True) # String format of 0 (000) 000-0000.
+    
+    #Relationships
     apartments = db.relationship('Apartment', backref='landlord', lazy=True)
+    
     __mapper_args__ = {
-        'polymorphic_identity': 'landlord',
+        'polymorphic_identity': 'landlord'
     }
 
+    '''
     def create_listing(self, name, location, total_units, units_available, apartment_details):
         apartment = Apartment(apartment_id = self.id,
                               landlord_id=self.id,
@@ -101,6 +106,9 @@ class Landlord(User):
         db.session.add(apartment)
         db.session.commit()
         return apartment
+    '''
+    def __init__(self, name, email, password):
+        super().__init__(name, email, password, type="landlord")
 
     def __repr__(self):
         return f'<Landlord {self.id} : {self.name} - {self.email}>'
