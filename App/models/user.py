@@ -199,11 +199,23 @@ class ApartmentAmenity(db.Model):
 
 class Review(db.Model):
     __tablename__ = 'review'
-    id = db.Column(db.Integer, primary_key=True)
+    review_id = db.Column(db.Integer, primary_key=True)
     review_text = db.Column(db.String(200), nullable=False)
-    apartment_id = db.Column(db.Integer, db.ForeignKey('apartment.id'), nullable=False)
-    tenant_id = db.Column(db.Integer, db.ForeignKey('tenant.id'), nullable=False)
+    apartment_id = db.Column(db.Integer, db.ForeignKey('apartment.apartment_id'), nullable=False)
+    tenant_id = db.Column(db.Integer, db.ForeignKey('tenant.tenant_id'), nullable=False)
 
+    def __init__ (self, tenant_id, apartment_id, review_text):
+        self.tenant_id= tenant_id
+        self.apartment_id= apartment_id
+        self.review_text= review_text
+
+    def get_json(self):
+        return{
+            "tenant_id": self.tenant_id,
+            "apartment_id": self.apartment_id,
+            "review": self.review_text
+        }
+    
     def __repr__(self):
         return f'<Review {self.id} : {self.review_text}>'
     
