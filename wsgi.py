@@ -1,9 +1,10 @@
 import click, pytest, sys
 from flask import Flask
 from flask.cli import with_appcontext, AppGroup
+from werkzeug.security import generate_password_hash
 
 from App.database import db, get_migrate
-from App.models import User
+from App.models import User, Tenant, Landlord, Apartment, Amenity, ApartmentAmenity, Review
 from App.main import create_app
 from App.controllers import (
     create_user,
@@ -22,7 +23,12 @@ from App.controllers import (
     get_apartment_reviews,
     delete_tenant_review,
     delete_amenity,
-    get_amenity
+    get_amenity,
+    update_listing,
+    delete_listing,
+    add_amenity_to_apartment,
+    remove_amenity_from_apartment,
+    list_apartment_amenities
 )
 
 app = create_app()
@@ -73,6 +79,31 @@ def list_user_command():
 app.cli.add_command(user_cli)
 
 '''
+Auth Commands
+'''
+auth_cli = AppGroup('auth', help='Authentication commands')
+
+@auth_cli.command("create-admin", help="Creates a new admin user")
+@click.option('--default', is_flag=True, help="Create a default admin user")
+@click.option('--username', prompt=True, help="Admin username")
+@click.option('--email', prompt=True, help="Admin email")
+@click.option('--password', prompt=True, hide_input=True, confirmation_prompt=True, help="Admin password")
+def create_admin_command(default, username, email, password):
+    if default:
+        username = "admin"
+        email = "admin@rentwise.com"
+        password = "admin123"
+        print("Creating default admin user...")
+    
+    hashed_password = generate_password_hash(password)
+    admin = User(username=username, email=email, password=hashed_password, is_admin=True)
+    db.session.add(admin)
+    db.session.commit()
+    print(f"Admin user '{username}' created successfully.")
+
+app.cli.add_command(auth_cli)
+
+'''
 Tenant Commands
 '''
 tenant_cli = AppGroup('tenant', help='Tenant management commands')
@@ -118,20 +149,21 @@ amenity_cli = AppGroup('amenity', help='Amenity management commands')
 @amenity_cli.command("create", help="Creates a new amenity")
 @click.option('--name', prompt=True, help="Amenity name")
 @click.option('--default', is_flag=True, help="Create default amenities")
-def create_amenity_command(name, default):
+@click.option('--description', help="Amenity description")
+def create_amenity_command(name, default, description):
     if default:
         default_amenities = [
-            "Parking",
-            "Pool", 
-            "Gym",
-            "WiFi",
-            "Security",
-            "Air Conditioning",
-            "Laundry",
-            "Pet Friendly",
-            "Furnished"
+            ("Parking", "Reserved parking spot"),
+            ("Pool", "Access to swimming pool"),
+            ("Gym", "24/7 fitness center access"),
+            ("WiFi", "High-speed internet included"),
+            ("Security", "24/7 security system"),
+            ("Air Conditioning", "Central AC system"),
+            ("Laundry", "In-unit laundry"),
+            ("Pet Friendly", "Pets allowed"),
+            ("Furnished", "Fully furnished unit")
         ]
-        for amenity_name in default_amenities:
+        for amenity_name, amenity_desc in default_amenities:
             amenity = create_amenity(amenity_name)
             if amenity:
                 print(f"Created default amenity: {amenity_name}")
@@ -175,6 +207,137 @@ def get_amenity_command(id):
 app.cli.add_command(amenity_cli)
 
 '''
+Apartment Commands
+'''
+apartment_cli = AppGroup('apartment', help='Apartment management commands')
+
+@apartment_cli.command("create", help="Create a new apartment listing")
+@click.option('--landlord-id', type=int, prompt=True, help="Landlord ID")
+@click.option('--name', prompt=True, help="Apartment name")
+@click.option('--location', prompt=True, help="Apartment location")
+@click.option('--units-available', type=int, prompt=True, help="Number of available units")
+@click.option('--units-total', type=int, prompt=True, help="Total number of units")
+@click.option('--details', prompt=True, help="Apartment details")
+def create_apartment_command(landlord_id, name, location, units_available, units_total, details):
+    units_not_available = units_total - units_available
+    if units_not_available < 0:
+        print("Error: Available units cannot exceed total units")
+        return
+
+    apartment = create_listing(
+        landlord_id=landlord_id,
+        apartment_name=name,
+        apartment_location=location,
+        number_of_units_avaliable=units_available,
+        number_of_units_not_avaliable=units_not_available,
+        apartment_details=details,
+        amenities_quantity=[]  # Can be updated later with add-amenity command
+    )
+    
+    if apartment:
+        print(f"Apartment '{name}' created successfully.")
+    else:
+        print("Failed to create apartment listing.")
+
+@apartment_cli.command("list", help="List all apartments")
+@click.option('--landlord-id', type=int, help="Filter by landlord ID")
+def list_apartments_command(landlord_id):
+    apartments = list_all_apartments()
+    if not apartments:
+        print("No apartments found.")
+        return
+    
+    for apt in apartments:
+        if landlord_id and apt.get('landlord_id') != landlord_id:
+            continue
+        print(f"\nID: {apt['apartment_id']}")
+        print(f"Name: {apt['apartment_name']}")
+        print(f"Location: {apt['apartment_location']}")
+        print(f"Available Units: {apt['number_of_units_avaliable']}")
+        print(f"Details: {apt['apartment_details']}")
+        print("-" * 40)
+
+@apartment_cli.command("update", help="Update apartment listing")
+@click.option('--landlord-id', type=int, prompt=True, help="Landlord ID")
+@click.option('--apartment-id', type=int, prompt=True, help="Apartment ID")
+@click.option('--name', help="New apartment name")
+@click.option('--location', help="New apartment location")
+@click.option('--units-available', type=int, help="New number of available units")
+@click.option('--units-not-available', type=int, help="New number of unavailable units")
+@click.option('--details', help="New apartment details")
+def update_apartment_command(landlord_id, apartment_id, name, location, units_available, units_not_available, details):
+    result = update_listing(
+        landlord_id=landlord_id,
+        apartment_id=apartment_id,
+        apartment_name=name,
+        apartment_location=location,
+        number_of_units_avaliable=units_available,
+        number_of_units_not_avaliable=units_not_available,
+        apartment_details=details
+    )
+    
+    if result:
+        print("Apartment updated successfully.")
+    else:
+        print("Failed to update apartment. Check landlord and apartment IDs.")
+
+@apartment_cli.command("delete", help="Delete apartment listing")
+@click.option('--landlord-id', type=int, prompt=True, help="Landlord ID")
+@click.option('--apartment-id', type=int, prompt=True, help="Apartment ID")
+def delete_apartment_command(landlord_id, apartment_id):
+    result = delete_listing(landlord_id, apartment_id)
+    if result:
+        print("Apartment deleted successfully.")
+    else:
+        print("Failed to delete apartment. Check landlord and apartment IDs.")
+
+@apartment_cli.command("add-amenity", help="Add amenity to apartment")
+@click.option('--apartment-id', type=int, prompt=True, help="Apartment ID")
+@click.option('--amenity-id', type=int, prompt=True, help="Amenity ID")
+@click.option('--landlord-id', type=int, prompt=True, help="Landlord ID")
+@click.option('--quantity', type=int, default=1, help="Quantity of the amenity")
+def add_apartment_amenity_command(apartment_id, amenity_id, landlord_id, quantity):
+    result = add_amenity_to_apartment(
+        apartment_id=apartment_id,
+        amenity_id=amenity_id,
+        landlord_id=landlord_id,
+        quantity=quantity
+    )
+    if result:
+        print(f"Amenity added to apartment successfully.")
+    else:
+        print("Failed to add amenity to apartment.")
+
+@apartment_cli.command("remove-amenity", help="Remove amenity from apartment")
+@click.option('--apartment-id', type=int, prompt=True, help="Apartment ID")
+@click.option('--amenity-id', type=int, prompt=True, help="Amenity ID")
+@click.option('--landlord-id', type=int, prompt=True, help="Landlord ID")
+def remove_apartment_amenity_command(apartment_id, amenity_id, landlord_id):
+    result = remove_amenity_from_apartment(
+        apartment_id=apartment_id,
+        amenity_id=amenity_id,
+        landlord_id=landlord_id
+    )
+    if result:
+        print("Amenity removed from apartment successfully.")
+    else:
+        print("Failed to remove amenity from apartment.")
+
+@apartment_cli.command("list-amenities", help="List amenities of an apartment")
+@click.option('--apartment-id', type=int, prompt=True, help="Apartment ID")
+def list_apartment_amenities_command(apartment_id):
+    amenities = list_apartment_amenities(apartment_id)
+    if not amenities:
+        print("No amenities found for this apartment.")
+        return
+    
+    print(f"\nAmenities for Apartment {apartment_id}:")
+    for amenity in amenities:
+        print(f"- {amenity['amenity_name']} (ID: {amenity['amenity_id']})")
+
+app.cli.add_command(apartment_cli)
+
+'''
 Search Commands
 '''
 search_cli = AppGroup('search', help='Search commands')
@@ -183,6 +346,10 @@ search_cli = AppGroup('search', help='Search commands')
 @click.option('--location', help="Search by location")
 @click.option('--amenity', help="Search by amenity name")
 def search_apartments_command(location, amenity):
+    if not location and not amenity:
+        print("Please provide either location or amenity to search.")
+        return
+
     found = get_apartments(location, amenity)
     
     if not found:
