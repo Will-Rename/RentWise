@@ -1,7 +1,7 @@
 from App.models import User, Tenant, Landlord
 from App.database import db
 
-def create_user(name, email, password, type, phone_number=None):
+def create_user(name, email, password, type, phone_number=None, apartment_id=None):
     if type not in ["tenant", "landlord"]:
         print(f"This user type {type} is invalid")
         return None
@@ -12,15 +12,32 @@ def create_user(name, email, password, type, phone_number=None):
         print("This user already exist")
         return None
     
+    '''
+    user = User(name=name, email=email, password=password)
+    user.type = type
+    db.session.add(user)
+    db.session.flush()
+    '''
+
     if type == "tenant":
-        new_user = Tenant(name=name, email=email, password=password)
+        if apartment_id is None:
+            print("Assign tenant to apartment")
+            return None
+        tenant = Tenant(name=name, email=email, password=password, apartment_id=apartment_id)
+        db.session.add(tenant)
+        db.session.commit()
+        print(f"Tenant {tenant.name} has been created")
+        return tenant
     elif type == "landlord":
-        new_user = Landlord(name=name, email=email, password=password, phone_number=phone_number)
-    
-    db.session.add(new_user)
-    db.session.commit()
-    print(f"User {new_user.name} has been created")
-    return new_user
+        if phone_number is None:
+            print("Give landlord a phone number")
+            return None
+        landlord = Landlord(name=name, email=email, password=password, phone_number=phone_number)
+        db.session.add(landlord)
+        db.session.commit()
+        print(f"Landlord {landlord.name} has been created")
+        return landlord
+    return None
 
 def get_user_by_username(username):
     return User.query.filter_by(name=username).first()

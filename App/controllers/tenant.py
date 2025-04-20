@@ -1,6 +1,7 @@
 from App.models import User, Tenant, Review
 from App.database import db
 
+'''
 #create_tenant
 def create_tenant(name, email, password, apartment_id):
     if User.query.filter_by(email=email).first():
@@ -12,6 +13,7 @@ def create_tenant(name, email, password, apartment_id):
         db.session.commit()
         print(f"Tenant {new_tenant.name} has been created")
         return new_tenant
+'''
 
 #create_review - application main feature 2
 def create_review(tenant_id, apartment_id, review_text):
