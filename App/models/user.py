@@ -5,7 +5,7 @@ class User(db.Model):
     __tablename__ = "user"
  
     user_id = db.Column(db.Integer, unique=True, primary_key=True)
-    name =  db.Column(db.String(120), nullable=False)
+    name =  db.Column(db.String(120), nullable=False, unique=True)
     email = db.Column(db.String(120), nullable=False, unique=True)
     password = db.Column(db.String(120), nullable=False)
     type = db.Column(db.String(50)) 
@@ -121,7 +121,7 @@ class Landlord(User):
 
 class Apartment(db.Model):
     __tablename__ = 'apartment'
-    
+
     apartment_id = db.Column(db.Integer, primary_key=True)
     apartment_name = db.Column(db.String(100), nullable=False)
     apartment_location = db.Column(db.String(100), nullable=False)
