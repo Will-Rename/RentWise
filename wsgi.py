@@ -199,8 +199,8 @@ def delete_amenity_command(id):
 def get_amenity_command(id):
     amenity = get_amenity(id)
     if amenity:
-        print(f"ID: {amenity.id}")
-        print(f"Name: {amenity.amenity_name}")
+        print(f"ID: {amenity['amenity_id']}")
+        print(f"Name: {amenity['amenity_name']}")
     else:
         print("Amenity not found.")
 
