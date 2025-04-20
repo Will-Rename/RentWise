@@ -4,7 +4,7 @@ from App.database import db
 
 #create_landlord
 def create_landlord(name, email, password, phone_number):
-    if Landlord.query.filter_by(email=email).first(): 
+    if User.query.filter_by(email=email).first(): 
         print("Email is already taken") 
         return None
     else:
