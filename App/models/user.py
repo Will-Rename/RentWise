@@ -71,6 +71,10 @@ class Tenant(User):
         print (f"Tenant {self.user_id} created a review")
         return review
 
+    def __init__(self, name, email, password, apartment_id):
+        super().__init__(name=name, email=email, password=password)
+        self.apartment_id= apartment_id
+
     def __repr__(self):
         return f'<Tenant {self.user_id} : {self.name} - {self.email}>'
 
@@ -114,6 +118,10 @@ class Landlord(User):
             add_amenity_to_apartment(apartment_id=apartment.apartment_id, quantity=quantity, amenity_id=existing_amenity.amenity_id, landlord_id=self.user_id) #function in ApartmentAmenities controller
 
         return apartment
+
+    def __init__(self, name, email, password, phone_number):
+        super().__init__(name=name, email=email, password=password)
+        self.phone_number= phone_number
 
     def __repr__(self):
         return f'<Landlord {self.user_id} : {self.name} - {self.email}>'
