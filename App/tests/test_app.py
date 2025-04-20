@@ -162,6 +162,20 @@ class TenantUnitTests(unittest.TestCase):
         assert tenant_json['type'] == 'tenant'
         assert tenant_json['apartment_id'] == self.apartment.id
 
+class AmentitiesUnitTests(unittest.TestCase):
+    def test_create_amenity(self, init_db):
+
+        # Test basic amenity creation
+        amenity = Amenity(amenity_name='Swimming Pool')
+        db.session.add(amenity)
+        db.session.commit()
+
+        assert amenity.id is not None
+        assert amenity.amenity_name == 'Swimming Pool'
+        assert len(amenity.apartment_amenities) == 0
+
+    
+
 
 
 '''
