@@ -43,7 +43,7 @@ class User(db.Model):
 
 class Tenant(User):
     __tablename__ = 'tenant'
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
+    id = db.Column(db.Integer, db.ForeignKey('user.id'), primary_key=True)
     apartment_id = db.Column(db.Integer, db.ForeignKey('apartment.id'), nullable=False)
     reviews = db.relationship('Review', backref='tenant', lazy=True)
 
