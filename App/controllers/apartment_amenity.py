@@ -1,4 +1,4 @@
-from App.models import ApartmentAmenities, Apartment, Amenity
+from App.models import ApartmentAmenity, Apartment, Amenity
 from App.database import db
 
 #add_amenity_to_apartment
@@ -18,7 +18,12 @@ def add_amenity_to_apartment(apartment_id, quantity, amenity_id, landlord_id):
         print("This amenity does not exist")    
         return None
     
-    new_apartment_amenity = ApartmentAmenities(apartment_id=apartment_id, amenity_id=amenity_id, quantity=quantity)
+    existing_apartment_amenity = ApartmentAmenity.query.filter_by(apartment_id=apartment_id, amenity_id=amenity_id).first() 
+    if existing_apartment_amenity:
+        print("This amenity is already present in this apartment")    
+        return None
+    
+    new_apartment_amenity = ApartmentAmenity(apartment_id=apartment_id, amenity_id=amenity_id, quantity=quantity)
     db.session.add(new_apartment_amenity)
     db.session.commit()
     print(f"New amenity {existing_amenity.amenity_name} has been added to apartment {valid_apartment.apartment_name}")
@@ -26,7 +31,7 @@ def add_amenity_to_apartment(apartment_id, quantity, amenity_id, landlord_id):
 
 #remove_amenity_from_apartment
 def remove_amenity_from_apartment(apartment_id, amenity_id, landlord_id):
-    valid_apartment_amenity = ApartmentAmenities.query.filter_by(apartment_id=apartment_id, amenity_id=amenity_id).first()
+    valid_apartment_amenity = ApartmentAmenity.query.filter_by(apartment_id=apartment_id, amenity_id=amenity_id).first()
     valid_apartment = Apartment.query.get(apartment_id)
 
     if not valid_apartment:
@@ -41,7 +46,8 @@ def remove_amenity_from_apartment(apartment_id, amenity_id, landlord_id):
         print ("This is Apartment does not have this amenity")
         return None
     
+    amenity_name = Amenity.query.get(amenity_id).amenity_name if Amenity.query.get(amenity_id) else "Blank"
+
     db.session.delete(valid_apartment_amenity)
     db.session.commit()
-    print(f"Amenity {amenity_id.amenity_name} has been removed from apartment {apartment_id.apartment_name}")
-    
+    print(f"Amenity: {amenity_name} has been removed from apartment {valid_apartment.apartment_name}")
