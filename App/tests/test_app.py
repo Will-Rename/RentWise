@@ -73,7 +73,6 @@ class ApartmentUnitTests(unittest.TestCase):
         db.session.add(self.landlord)
         db.session.commit()
 
-    def test_new_apartment(self):
         apartment = Apartment(
             apartment_name='Test_Apartment',
             apartment_location='Test_Location',
