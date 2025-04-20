@@ -207,7 +207,48 @@ class AmentitiesUnitTests(unittest.TestCase):
         assert amenity.apartment_amenities[0].apartment == apartment
         assert amenity.apartment_amenities[0].quantity == 2
 
+    def test_amenity_json(self):
+        # Test amenity JSON representation
+        amenity = Amenity(amenity_name='Parking')
+        db.session.add(amenity)
+        db.session.commit()
+        
+        amenity_json = amenity.get_json()
+        assert amenity_json['id'] == amenity.id
+        assert amenity_json['amenity_name'] == 'Parking'
 
+class ReviewUnitTests(unittest.TestCase):
+
+    def setup(self):
+        """Setup test data for reviews"""
+        # Create landlord
+        self.landlord = Landlord(
+            name='John Smith',
+            email='john@example.com',
+            password='password',
+            phone_number='(555) 123-4567'
+        )
+        
+        # Create apartment
+        self.apartment = Apartment(
+            apartment_name='City View',
+            apartment_location='Downtown',
+            landlord_id=self.landlord.id,
+            number_of_units_total=50,
+            number_of_units_available=25,
+            number_of_units_not_available=25,
+            apartment_details='Modern downtown living'
+        )
+
+        # Create tenant
+        self.tenant = Tenant(
+            name='Jane Doe',
+            email='jane@example.com',
+            password='password',
+            apartment_id=self.apartment.id
+        )
+        db.session.add_all([self.landlord, self.apartment, self.tenant])
+        db.session.commit()
 
 
 
