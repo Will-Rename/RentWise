@@ -162,6 +162,8 @@ class TenantUnitTests(unittest.TestCase):
         assert tenant_json['type'] == 'tenant'
         assert tenant_json['apartment_id'] == self.apartment.id
 
+
+
 class AmentitiesUnitTests(unittest.TestCase):
     def test_create_amenity(self, init_db):
 
@@ -174,7 +176,38 @@ class AmentitiesUnitTests(unittest.TestCase):
         assert amenity.amenity_name == 'Swimming Pool'
         assert len(amenity.apartment_amenities) == 0
 
+    def test_amenity_apartment_relationship(self):
     
+        # Create test apartment
+        apartment = Apartment(
+            apartment_name='Luxury Apartments',
+            apartment_location='Beachfront',
+            landlord_id=1,  
+            number_of_units_total=20,
+            number_of_units_available=10,
+            number_of_units_not_available=10,
+            apartment_details='Luxury beachfront living'
+        )
+
+        # Create amenity
+        amenity = Amenity(amenity_name='Gym')
+        db.session.add_all([apartment, amenity])
+        
+        # Create relationship
+        apartment_amenity = ApartmentAmenity(
+            apartment_id=apartment.id,
+            amenity_id=amenity.id,
+            quantity=2
+        )
+        db.session.add(apartment_amenity)
+        db.session.commit()
+
+        # Test relationships
+        assert len(amenity.apartment_amenities) == 1
+        assert amenity.apartment_amenities[0].apartment == apartment
+        assert amenity.apartment_amenities[0].quantity == 2
+
+
 
 
 
