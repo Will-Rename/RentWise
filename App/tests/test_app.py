@@ -20,27 +20,44 @@ LOGGER = logging.getLogger(__name__)
    Unit Tests
 '''
 class UserUnitTests(unittest.TestCase):
+    def setUp(self):
+        self.app = create_app({'TESTING': True, 'SQLALCHEMY_DATABASE_URI': 'sqlite:///:memory:'})
+        self.client = self.app.test_client()
+        with self.app.app_context():
+            create_db()
+
+    def tearDown(self):
+        with self.app.app_context():
+            db.session.remove()
+            db.drop_all()
 
     def test_new_user(self):
-        user = User(name="bob", email="bob@mail.com", password="bobpass")
-        assert user.username == "bob"
+        user = User(name="bob", email="bob@test.com", password="bobpass")
+        assert user.name == "bob"
+        assert user.email == "bob@test.com"
+        assert user.check_password("bobpass")
 
-    # pure function no side effects or integrations called
     def test_get_json(self):
-        user = User("bob", "bobpass")
+        user = User(name="bob", email="bob@test.com", password="bobpass")
         user_json = user.get_json()
-        self.assertDictEqual(user_json, {"id":None, "name":"bob"})
+        self.assertDictEqual(user_json, {
+            "id": None,
+            "name": "bob",
+            "email": "bob@test.com",
+            "type": None
+        })
     
     def test_hashed_password(self):
         password = "mypass"
-        hashed = generate_password_hash(password, method='sha256')
-        user = User("bob", password)
+        user = User(name="bob", email="bob@test.com", password=password)
         assert user.password != password
+        assert user.password.startswith('scrypt$')
 
     def test_check_password(self):
         password = "mypass"
-        user = User("bob", password)
+        user = User(name="bob", email="bob@test.com", password=password)
         assert user.check_password(password)
+        assert not user.check_password("wrongpassword")
 
 
     
