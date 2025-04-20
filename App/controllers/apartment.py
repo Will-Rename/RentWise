@@ -1,4 +1,4 @@
-from App.models import Apartment, Review, ApartmentAmenities, Amenity
+from App.models import Apartment, Review, ApartmentAmenity, Amenity
 from App.database import db
 
 #get_apartments using location or amenity - application main feature 3
@@ -15,9 +15,9 @@ def get_apartments(location=None, amenity=None):
 
         if not amenity_found:
             print(f"This amenity: {amenity} was not found")
-            return None
+            return []
         
-        amenity_found_apartments = ApartmentAmenities.query.filter_by(amenity_id=amenity_found.amenity_id).all()
+        amenity_found_apartments = ApartmentAmenity.query.filter_by(amenity_id=amenity_found.amenity_id).all()
         found = [found_location.apartment for found_location in amenity_found_apartments if found_location.apartment]
 
     elif location and amenity:
@@ -26,9 +26,9 @@ def get_apartments(location=None, amenity=None):
 
         if not amenity_found:
             print(f"This amenity: {amenity} was not found")
-            return None
+            return []
 
-        found = Apartment.query.join(ApartmentAmenities).filter(Apartment.apartment_location == location, ApartmentAmenities.amenity_id==amenity_found.amenity_id).all()
+        found = Apartment.query.join(ApartmentAmenity).filter(Apartment.apartment_location == location, ApartmentAmenity.amenity_id==amenity_found.amenity_id).all()
 
     else:
         print("No value was entered, enter either the location or amenity or both")
@@ -74,7 +74,7 @@ def get_apartment_reviews(apartment_id):
 
     if not valid_apartment:
         print("This is not a valid apartment") 
-        return None
+        return []
     
     apartment_reviews = Review.query.filter_by(apartment_id=apartment_id).all()
         
@@ -96,16 +96,16 @@ def list_apartment_amenities(apartment_id):
 
     if not valid_apartment:
         print("This is not a valid Apartment")
-        return None
+        return []
     
-    apartment_amenities = ApartmentAmenities.query.filter_by(apartment_id=apartment_id).all()
+    apartment_amenities = ApartmentAmenity.query.filter_by(apartment_id=apartment_id).all()
     
     list_of_apartment_amenities= [
         {
-            "amenity_id": amenity.amenity_id,
-            "apartment_id": amenity.apartment_id,
-            "amenity_name": amenity.amenity_name,
+            "amenity_id": a.amenity_id,
+            "apartment_id": a.apartment_id,
+            "amenity_name": a.amenity.amenity_name,
          }
-        for amenity in apartment_amenities
+        for a in apartment_amenities
     ]
     return list_of_apartment_amenities

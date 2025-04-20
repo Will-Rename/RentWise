@@ -1,8 +1,21 @@
-modules = ["python-3.12", "web", "nodejs-20", "bash"]
+modules = ["python-3.12", "web", "nodejs-20", "nix"]
 run = "npm run serve"
 
 [nix]
 channel = "stable-24_05"
+packages = ["libev", "libmysqlclient"]
 
 [deployment]
 run = ["sh", "-c", "npm run serve"]
+
+[workflows]
+runButton = "Python Flask"
+
+[[workflows.workflow]]
+name = "Python Flask"
+author = 19903429
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python -m flask run"

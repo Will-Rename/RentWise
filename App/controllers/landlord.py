@@ -3,7 +3,7 @@ from App.controllers import add_amenity_to_apartment
 from App.database import db
 
 #create_landlord
-def create_landlord(name, email, password, phone_contact):
+def create_landlord(name, email, password, phone_number):
     if User.query.filter_by(email=email).first(): 
         print("Email is already taken") 
         return None
@@ -43,7 +43,7 @@ def create_listing(landlord_id, apartment_name, apartment_location, number_of_un
     
     
 #update_listing
-def update_listing(landlord_id, apartment_id, apartment_name=None, apartment_location=None, number_of_units_avaliable=None, number_of_units_not_avaliable=None, apartment_details=None):
+def update_listing(landlord_id, apartment_id, apartment_name=None, apartment_location=None, number_of_units_available=None, number_of_units_not_available=None, apartment_details=None):
     valid_landlord = Landlord.query.get(landlord_id)
     valid_apartment = Apartment.query.get(apartment_id)
 
@@ -55,7 +55,7 @@ def update_listing(landlord_id, apartment_id, apartment_name=None, apartment_loc
         print("This is not a valid apartment")
         return None
     
-    if valid_landlord.id != valid_apartment.landlord_id:
+    if valid_landlord.user_id != valid_apartment.landlord_id:
         print("This landlord is not authorized to update this listing")
         return None
     
@@ -65,11 +65,11 @@ def update_listing(landlord_id, apartment_id, apartment_name=None, apartment_loc
     if apartment_location:
         valid_apartment.apartment_location = apartment_location
 
-    if number_of_units_avaliable:
-        valid_apartment.number_of_units_avaliable = number_of_units_avaliable
+    if number_of_units_available:
+        valid_apartment.number_of_units_available = number_of_units_available
         
-    if number_of_units_not_avaliable:
-        valid_apartment.number_of_units_not_avaliable = number_of_units_not_avaliable
+    if number_of_units_not_available:
+        valid_apartment.number_of_units_not_available = number_of_units_not_available
 
     if apartment_details:
         valid_apartment.apartment_details = apartment_details
@@ -91,7 +91,7 @@ def delete_listing(landlord_id, apartment_id):
         print("This is not a valid apartment")
         return None
     
-    if valid_landlord.id != valid_apartment.landlord_id:
+    if valid_landlord.user_id != valid_apartment.landlord_id:
         print("This landlord is not authorized to delete this listing")
         return None
     
