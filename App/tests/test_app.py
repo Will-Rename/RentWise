@@ -50,12 +50,16 @@ class UserUnitTests(unittest.TestCase):
     def test_hashed_password(self):
         password = "mypass"
         user = User(name="bob", email="bob@test.com", password=password)
+        db.session.add(user)
+        db.session.commit()
         assert user.password != password
-        assert user.password.startswith('scrypt$')
+        self.assertTrue(user.password.startswith('scrypt$'))
 
     def test_check_password(self):
         password = "mypass"
         user = User(name="bob", email="bob@test.com", password=password)
+        db.session.add(user)
+        db.session.commit()
         assert user.check_password(password)
         assert not user.check_password("wrongpassword")
 
