@@ -120,14 +120,7 @@ class TenantUnitTests(unittest.TestCase):
             phone_number='(868) 123-4567'
         )
         db.session.add(self.landlord)
-
-        self.landlord = Landlord(
-            name='John',
-            email='landlord@mail.com',
-            password='password',
-            phone_number='(868) 123-4567'
-        )
-        db.session.add(self.landlord)
+        db.session.commit()
 
         self.apartment = Apartment(
             apartment_name='Test_Apartment',
