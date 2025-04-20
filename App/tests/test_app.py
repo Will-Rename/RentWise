@@ -251,6 +251,32 @@ class ReviewUnitTests(unittest.TestCase):
         db.session.commit()
 
 
+        assert review.id is not None
+        assert review.review_text == 'Great location and amenities!'
+        assert review.apartment == self.apartment
+        assert review.tenant == self.tenant
+        assert review.date_created is not None
+
+    def test_review_relationships(self):
+        """Test review relationships"""
+        review = Review(
+            review_text='Could be cleaner in common areas',
+            apartment_id=self.apartment.id,
+            tenant_id=self.tenant.id
+        )
+        db.session.add(review)
+        db.session.commit()
+
+        # Test apartment 
+        assert len(self.apartment.reviews) == 1
+        assert self.apartment.reviews[0] == review
+        
+        # Test tenant
+        assert len(self.tenant.reviews) == 1
+        assert self.tenant.reviews[0] == review
+    
+
+
 
 '''
     Integration Tests
