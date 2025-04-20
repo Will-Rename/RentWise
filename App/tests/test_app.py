@@ -274,7 +274,22 @@ class ReviewUnitTests(unittest.TestCase):
         # Test tenant
         assert len(self.tenant.reviews) == 1
         assert self.tenant.reviews[0] == review
-    
+
+    def test_review_json(self):
+        # Test review JSON representation
+        review = Review(
+            review_text='Overall good experience',
+            apartment_id=self.apartment.id,
+            tenant_id=self.tenant.id
+        )
+        db.session.add(review)
+        db.session.commit()
+        
+        review_json = review.get_json()
+        assert review_json['id'] == review.id
+        assert review_json['review_text'] == 'Overall good experience'
+        assert review_json['apartment_id'] == self.apartment.id
+        assert review_json['tenant_id'] == self.tenant.id
 
 
 
