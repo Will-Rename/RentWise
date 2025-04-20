@@ -1,4 +1,4 @@
-import click, pytest, sys
+import click, sys
 from flask import Flask
 from flask.cli import with_appcontext, AppGroup
 from werkzeug.security import generate_password_hash
@@ -426,11 +426,16 @@ test = AppGroup('test', help='Testing commands')
 @test.command("user", help="Run User tests")
 @click.argument("type", default="all")
 def user_tests_command(type):
-    if type == "unit":
-        sys.exit(pytest.main(["-k", "UserUnitTests"]))
-    elif type == "int":
-        sys.exit(pytest.main(["-k", "UserIntegrationTests"]))
-    else:
-        sys.exit(pytest.main(["-k", "App"]))
+    try:
+        import pytest  # Only import pytest when running tests
+        if type == "unit":
+            sys.exit(pytest.main(["-k", "UserUnitTests"]))
+        elif type == "int":
+            sys.exit(pytest.main(["-k", "UserIntegrationTests"]))
+        else:
+            sys.exit(pytest.main(["-k", "App"]))
+    except ImportError:
+        print("pytest is not installed. Please install it with 'pip install pytest' to run tests.")
+        sys.exit(1)
 
 app.cli.add_command(test)

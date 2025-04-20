@@ -12,7 +12,7 @@ def get_migrate(app):
 
 # Create a function to create the database
 def create_db():
-  with app.app_context()
+  with app.app_context():
     db.create_all()
 
 # Create a function to initialize the database
@@ -25,8 +25,8 @@ def initialize(app):
 
 #Create Amenities
 amenities = [
-  Amenity(amenity_name='Wi-Fi')
-  Amenity(amenity_name='Parking')
+  Amenity(amenity_name='Wi-Fi'),
+  Amenity(amenity_name='Parking'),
   Amenity(amenity_name='Gym')
 ]
 db.session.add_all(amenities)
@@ -35,16 +35,16 @@ db.session.add_all(amenities)
 
 landlord = [Landlord(name='John', email='john@email.com', password=generate_password_hash('password123', method='scrypt'), phone_number='123-456-7890'),
             Landlord(name='Jane', email='jane@email.com', password=generate_password_hash('password123', method='scrypt'), phone_number='098-765-4321'),
-            Landlord(name='Bob', email='bob@email.com', password=generate_password_hash('bobpass', method='scrypt'), phone_number='111-222-3333'))]
+            Landlord(name='Bob', email='bob@email.com', password=generate_password_hash('bobpass', method='scrypt'), phone_number='111-222-3333')]
 
 tenants = [Tenant(name='Alice', email='alice@email.com', password=generate_password_hash('alicepass', method='scrypt'), apartment_id=1),
-           Tenant(name='Bob', email='Jas@email.com', password=generate_password_hash('Jaspass', method='scrypt'), apartment_id=2))]
+           Tenant(name='Bob', email='Jas@email.com', password=generate_password_hash('Jaspass', method='scrypt'), apartment_id=2)]
 
-db.session.add_all(landlord, tenants)
+db.session.add_all(landlord + tenants)
 
 #Create Apartments
 Apartments = [Apartment(apartment_name='Apartment 1', apartment_location='123 Sesame St', landlord_id=1, number_of_units_total=10, number_of_units_available=5, number_of_units_not_available=5, apartment_details='One rooms'),
-              Apartment(apartment_name='Apartment 2', apartment_location='456 Sesame St', landlord_id=2, number_of_units_total=10, number_of_units_available=5, number_of_units_not_available=5, apartment_details='Two rooms')
+              Apartment(apartment_name='Apartment 2', apartment_location='456 Sesame St', landlord_id=2, number_of_units_total=10, number_of_units_available=5, number_of_units_not_available=5, apartment_details='Two rooms'),
               Apartment(apartment_name='Apartment 3', apartment_location='789 Sesame St', landlord_id=3, number_of_units_total=10, number_of_units_available=5, number_of_units_not_available=5, apartment_details='Three rooms')
               ]
 db.session.add_all(Apartments)
