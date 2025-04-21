@@ -209,18 +209,28 @@ class TenantUnitTests(unittest.TestCase):
             #assert tenant_json['apartment_id'] == self.apartment.apartment_id
 
 
-'''
-class AmentitiesUnitTests(unittest.TestCase):
-    def test_create_amenity(self, init_db):
 
+class AmentitiesUnitTests(unittest.TestCase):
+
+    def setUp(self):
+        self.app = create_app({'TESTING': True, 'SQLALCHEMY_DATABASE_URI': 'sqlite:///:memory:'})
+        self.client = self.app.test_client()
+        with self.app.app_context():
+            create_db()
+
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
+    
+    def test_create_amenity(self):
         # Test basic amenity creation
         amenity = Amenity(amenity_name='Swimming Pool')
         db.session.add(amenity)
         db.session.commit()
 
-        assert amenity.id is not None
-        assert amenity.amenity_name == 'Swimming Pool'
-        assert len(amenity.apartment_amenities) == 0
+        self.assertIsNotNone(amenity.amenity_id)
+        self.assertEqual(amenity.amenity_name, 'Swimming Pool')
+        self.assertEqual(len(amenity.apartment_amenities), 0)
 
     def test_amenity_apartment_relationship(self):
     
@@ -229,7 +239,7 @@ class AmentitiesUnitTests(unittest.TestCase):
             apartment_name='Luxury Apartments',
             apartment_location='Beachfront',
             landlord_id=1,  
-            number_of_units_total=20,
+            #number_of_units_total=20,
             number_of_units_available=10,
             number_of_units_not_available=10,
             apartment_details='Luxury beachfront living'
@@ -238,11 +248,12 @@ class AmentitiesUnitTests(unittest.TestCase):
         # Create amenity
         amenity = Amenity(amenity_name='Gym')
         db.session.add_all([apartment, amenity])
+        db.session.commit()
         
         # Create relationship
         apartment_amenity = ApartmentAmenity(
-            apartment_id=apartment.id,
-            amenity_id=amenity.id,
+            apartment_id=apartment.apartment_id,
+            amenity_id=amenity.amenity_id,
             quantity=2
         )
         db.session.add(apartment_amenity)
@@ -252,7 +263,7 @@ class AmentitiesUnitTests(unittest.TestCase):
         assert len(amenity.apartment_amenities) == 1
         assert amenity.apartment_amenities[0].apartment == apartment
         assert amenity.apartment_amenities[0].quantity == 2
-
+    '''
     def test_amenity_json(self):
         # Test amenity JSON representation
         amenity = Amenity(amenity_name='Parking')
@@ -262,12 +273,14 @@ class AmentitiesUnitTests(unittest.TestCase):
         amenity_json = amenity.get_json()
         assert amenity_json['id'] == amenity.id
         assert amenity_json['amenity_name'] == 'Parking'
-'''
+    '''
 
-'''
+
 class ReviewUnitTests(unittest.TestCase):
 
-    def setup(self):
+    def setUp(self):
+        db.create_all()
+    
         """Setup test data for reviews"""
         # Create landlord
         self.landlord = Landlord(
@@ -276,69 +289,79 @@ class ReviewUnitTests(unittest.TestCase):
             password='password',
             phone_number='(555) 123-4567'
         )
-        
+        db.session.add(self.landlord)
+        db.session.commit()
+    
         # Create apartment
         self.apartment = Apartment(
             apartment_name='City View',
             apartment_location='Downtown',
-            landlord_id=self.landlord.id,
-            number_of_units_total=50,
+            landlord_id=self.landlord.user_id,
+            #number_of_units_total=50,
             number_of_units_available=25,
             number_of_units_not_available=25,
             apartment_details='Modern downtown living'
         )
+        db.session.add(self.apartment)
+        db.session.commit()
 
         # Create tenant
         self.tenant = Tenant(
             name='Jane Doe',
             email='jane@example.com',
             password='password',
-            apartment_id=self.apartment.id
+            apartment_id=self.apartment.apartment_id
         )
-        db.session.add_all([self.landlord, self.apartment, self.tenant])
+        db.session.add(self.tenant)
         db.session.commit()
 
 
+        '''
         assert review.id is not None
         assert review.review_text == 'Great location and amenities!'
         assert review.apartment == self.apartment
         assert review.tenant == self.tenant
         assert review.date_created is not None
-
+        '''
+    def tearDown(self):
+        db.session.remove()
+        db.drop_all()
+        
     def test_review_relationships(self):
         """Test review relationships"""
         review = Review(
             review_text='Could be cleaner in common areas',
-            apartment_id=self.apartment.id,
-            tenant_id=self.tenant.id
+            apartment_id=self.apartment.apartment_id,
+            tenant_id=self.tenant.user_id
         )
         db.session.add(review)
         db.session.commit()
 
         # Test apartment 
-        assert len(self.apartment.reviews) == 1
-        assert self.apartment.reviews[0] == review
+        self.assertEqual(len(self.apartment.reviews), 1)
+        self.assertEqual(self.apartment.reviews[0], review)
         
         # Test tenant
-        assert len(self.tenant.reviews) == 1
-        assert self.tenant.reviews[0] == review
+        self.assertEqual(len(self.tenant.reviews), 1)
+        self.assertEqual(self.tenant.reviews[0], review)
 
+    '''
     def test_review_json(self):
         # Test review JSON representation
         review = Review(
             review_text='Overall good experience',
-            apartment_id=self.apartment.id,
-            tenant_id=self.tenant.id
+            apartment_id=self.apartment.apartment_id,
+            tenant_id=self.tenant.user_id
         )
         db.session.add(review)
         db.session.commit()
         
         review_json = review.get_json()
-        assert review_json['id'] == review.id
-        assert review_json['review_text'] == 'Overall good experience'
-        assert review_json['apartment_id'] == self.apartment.id
-        assert review_json['tenant_id'] == self.tenant.id
-'''
+        self.assertEqual(review_json['id'], review.review_id)
+        self.assertEqual(review_json['review_text'], 'Overall good experience')
+        self.assertEqual(review_json['apartment_id'], self.apartment.apartment_id)
+        self.assertEqual(review_json['tenant_id'], self.tenant.user_id)
+    '''
 
 
 '''
