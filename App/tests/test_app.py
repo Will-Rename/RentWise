@@ -10,7 +10,9 @@ from App.controllers import (
     login,
     get_user,
     get_user_by_username,
-    update_user
+    update_user,
+    create_amenity,
+    create_listing
 )
 
 
@@ -339,5 +341,29 @@ class UsersIntegrationTests(unittest.TestCase):
         update_user(1, "ronnie")
         user = get_user(1)
         assert user.username == "ronnie"
+
+#Test in terminal using: pytest -k "LandlordIntegrationTest" 
+class LandlordIntegrationTest(unittest.TestCase):
+    
+    def test_create_listing_with_amenities_and_details(self):
+        
+        landlord= create_user("john", "john@mail.com", "johnpass", "landlord", "(868) 123-4567")
+        
+        login("john", "johnpass")
+
+        create_amenity("Large Pool")
+        create_amenity("Parking")     
+
+        apartment=create_listing(landlord.user_id, "Apartment1", "Arima", 15, 2, "Safe environment", [{"amenity_name": "Large Pool", "quantity": 1}, {"amenity_name": "Parking", "quantity": 20}])
+
+        self.assertEqual(apartment.apartment_location, "Arima")
+        self.assertEqual(len(apartment.amenities),2)
+        self.assertEqual(apartment.landlord_id, landlord.user_id)
+
+
+
+
+
+ 
         
 
