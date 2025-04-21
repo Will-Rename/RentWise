@@ -326,7 +326,7 @@ class ReviewUnitTests(unittest.TestCase):
     def tearDown(self):
         db.session.remove()
         db.drop_all()
-        
+
     def test_review_relationships(self):
         """Test review relationships"""
         review = Review(
@@ -369,29 +369,37 @@ class ReviewUnitTests(unittest.TestCase):
 '''
 
 
-'''
 # This fixture creates an empty database for the test and deletes it after the test
 # scope="class" would execute the fixture once and resued for all methods in the class
 @pytest.fixture(autouse=True, scope="module")
 def empty_db():
     app = create_app({'TESTING': True, 'SQLALCHEMY_DATABASE_URI': 'sqlite:///test.db'})
-    create_db()
+    
+    with app.app_context():
+        create_db()
+
     yield app.test_client()
-    db.drop_all()
 
+    with app.app_context():
+        db.drop_all()
 
-def test_authenticate(self):
-    #user = create_user("bob", "bobpass")
-    user= create_user("bob", "bob@mail.com", "bobpass", "landlord", "(868) 000-0000")
-    assert login("bob", "bobpass") != None
+class AuthTest:
+    def test_authenticate(empty_db):
+        #user = create_user("bob", "bobpass")
+        user= create_user("bob", "bob@mail.com", "bobpass", "landlord", "(868) 000-0000")
+        assert login("bob", "bobpass") is not None
 
 class UsersIntegrationTests(unittest.TestCase):
-    #
+
+    def setUp(self):
+        app = create_app({'TESTING': True, 'SQLALCHEMY_DATABASE_URI': 'sqlite:///test.db'})
+        app.app_context().push()
+        create_db()
+
     def test_authenticate(self):
         #user = create_user("bob", "bobpass")
         user= create_user("bob", "bob@mail.com", "bobpass", "landlord", "(868) 000-0000")
-        assert login("bob", "bobpass") != None
-    #
+        assert login("bob", "bobpass") is not None
 
     def test_create_user(self):
         #user = create_user("rick", "bobpass")
@@ -488,11 +496,3 @@ class SearchIntegrationTest(unittest.TestCase):
         list_of_apartments = [apt["apartment_name"] for apt in desired_location_amenities]
         self.assertIn("Apartment4", list_of_apartments) #True
         self.assertIn("Apartment5", list_of_apartments) #True
-'''
-
-
-
-
- 
-        
-
