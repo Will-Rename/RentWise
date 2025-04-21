@@ -14,7 +14,8 @@ from App.controllers import (
     create_amenity,
     create_listing,
     add_tenant_to_apartment,
-    create_review
+    create_review,
+    get_apartments
 )
 
 
@@ -351,7 +352,6 @@ class LandlordIntegrationTest(unittest.TestCase):
     def test_create_listing_with_amenities_and_details(self):
         
         landlord= create_user("john", "john@mail.com", "johnpass", "landlord", "(868) 123-4567")
-        
         login("john", "johnpass")
 
         create_amenity("Large Pool")
@@ -364,12 +364,13 @@ class LandlordIntegrationTest(unittest.TestCase):
         self.assertEqual(apartment.landlord_id, landlord.user_id)
 
 
-#
+#Test in terminal using: pytest -k "TenantIntegrationTest"
 class TenantIntegrationTest(unittest.TestCase):
 
     def test_create_review_of_apartment(self):
         
         landlord= create_user("sam", "sam@mail.com", "sampass", "landlord", "(868) 891-0111")
+        login("sam", "sampass")
 
         create_amenity("2 Large Bed Rooms")
         create_amenity("Large Yard")     
@@ -377,6 +378,7 @@ class TenantIntegrationTest(unittest.TestCase):
         apartment3=create_listing(landlord.user_id, "Apartment3", "Barataria", 10, 8, "Luxury apartments", [{"amenity_name": "2 Large Bed Rooms", "quantity": 18}, {"amenity_name": "Large Yard", "quantity": 1}])
 
         tenant= create_user("smith", "smith@mail.com", "smithpass", "tenant", None, apartment_id=apartment3.apartment_id)
+        login("smith", "smithpass")
 
         add_tenant_to_apartment(tenant.user_id, apartment3.apartment_id)
 
@@ -389,7 +391,41 @@ class TenantIntegrationTest(unittest.TestCase):
         self.assertEqual(review.apartment_id, apartment3.apartment_id)
         
 
+#Test in terminal using: pytest -k "SearchIntegrationTest"
+class SearchIntegrationTest(unittest.TestCase):
+    
+    def test_publically_viewable_apt_listing_search_by_location_amenities(self):
+        
+        landlord= create_user("jake", "jake@mail.com", "jakepass", "landlord", "(868) 481-7108")
+        login("jake", "jakepass")
 
+        create_amenity("Large Kitchen")
+        create_amenity("2 Bathrooms")     
+
+        apartment4=create_listing(landlord.user_id, "Apartment4", "Caroni Central", 5, 2, "Happy environment", [{"amenity_name": "Large Kitchen", "quantity": 7}, {"amenity_name": "2 Bathrooms", "quantity": 7}])
+        
+        self.assertEqual(apartment4.apartment_location, "Caroni Central")
+        self.assertEqual(len(apartment4.amenities),2)
+        self.assertEqual(apartment4.landlord_id, landlord.user_id)
+        
+        apartment5=create_listing(landlord.user_id, "Apartment5", "San Juan", 10, 3, "Happy environment, safe building", [{"amenity_name": "Large Kitchen", "quantity": 13}, {"amenity_name": "2 Bathrooms", "quantity": 13}])
+
+        self.assertEqual(apartment5.apartment_location, "San Juan")
+        self.assertEqual(len(apartment5.amenities),2)
+        self.assertEqual(apartment5.landlord_id, landlord.user_id)
+
+
+        #search by location
+        desired_location_apartments = get_apartments(location="Caroni Central", amenity=None)
+        print("Desired apartments by location")
+        print(desired_location_apartments)
+        print("\n")
+
+        #search by amenities
+        desired_location_amenities = get_apartments(location=None, amenity="2 Bathrooms")
+        print("Desired apartments by amenity")
+        print(desired_location_amenities)
+        print("\n")
 
 
 

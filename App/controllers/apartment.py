@@ -44,8 +44,8 @@ def get_apartments(location=None, amenity=None):
         "apartment_id": apartments.apartment_id,
         "apartment_name": apartments.apartment_name,
         "apartment_location": apartments.apartment_location,
-        "number_of_units_avaliable": apartments.number_of_units_avaliable,
-        "number_of_units_not_avaliable": apartments.number_of_units_not_avaliable,
+        "number_of_units_available": apartments.number_of_units_available,
+        "number_of_units_not_available": apartments.number_of_units_not_available,
         "apartment_details": apartments.apartment_details,
         })
         
@@ -60,8 +60,8 @@ def list_all_apartments():
         "apartment_id": apartment.apartment_id,
         "apartment_name": apartment.apartment_name,
         "apartment_location": apartment.apartment_location,
-        "number_of_units_avaliable": apartment.number_of_units_avaliable,
-        "number_of_units_not_avaliable": apartment.number_of_units_not_avaliable,
+        "number_of_units_available": apartment.number_of_units_available,
+        "number_of_units_not_available": apartment.number_of_units_not_available,
         "apartment_details": apartment.apartment_details,
         }
         for apartment in all_apartments
