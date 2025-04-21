@@ -414,18 +414,16 @@ class SearchIntegrationTest(unittest.TestCase):
         self.assertEqual(len(apartment5.amenities),2)
         self.assertEqual(apartment5.landlord_id, landlord.user_id)
 
-
         #search by location
         desired_location_apartments = get_apartments(location="Caroni Central", amenity=None)
-        print("Desired apartments by location")
-        print(desired_location_apartments)
-        print("\n")
+        self.assertTrue(any(apt["apartment_name"]== "Apartment4" for apt in desired_location_apartments)) #True
+        self.assertFalse(any(apt["apartment_name"]== "Apartment5" for apt in desired_location_apartments)) #False
 
         #search by amenities
         desired_location_amenities = get_apartments(location=None, amenity="2 Bathrooms")
-        print("Desired apartments by amenity")
-        print(desired_location_amenities)
-        print("\n")
+        list_of_apartments = [apt["apartment_name"] for apt in desired_location_amenities]
+        self.assertIn("Apartment4", list_of_apartments) #True
+        self.assertIn("Apartment5", list_of_apartments) #True
 
 
 
