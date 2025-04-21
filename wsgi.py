@@ -64,6 +64,8 @@ def user_tests_command(type):
         sys.exit(pytest.main(["-k", "UserIntegrationTests"]))
     elif type == "landlord":
         sys.exit(pytest.main(["-k", "LandlordIntegrationTest"]))
+    elif type == "tenant":
+        sys.exit(pytest.main(["-k", "TenantIntegrationTest"]))
     else:
         sys.exit(pytest.main(["-k", "App"]))
     

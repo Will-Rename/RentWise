@@ -12,7 +12,9 @@ from App.controllers import (
     get_user_by_username,
     update_user,
     create_amenity,
-    create_listing
+    create_listing,
+    add_tenant_to_apartment,
+    create_review
 )
 
 
@@ -342,6 +344,7 @@ class UsersIntegrationTests(unittest.TestCase):
         user = get_user(1)
         assert user.username == "ronnie"
 
+
 #Test in terminal using: pytest -k "LandlordIntegrationTest" 
 class LandlordIntegrationTest(unittest.TestCase):
     
@@ -354,11 +357,39 @@ class LandlordIntegrationTest(unittest.TestCase):
         create_amenity("Large Pool")
         create_amenity("Parking")     
 
-        apartment=create_listing(landlord.user_id, "Apartment1", "Arima", 15, 2, "Safe environment", [{"amenity_name": "Large Pool", "quantity": 1}, {"amenity_name": "Parking", "quantity": 20}])
+        apartment=create_listing(landlord.user_id, "Apartment2", "Arima", 15, 2, "Safe environment", [{"amenity_name": "Large Pool", "quantity": 1}, {"amenity_name": "Parking", "quantity": 20}])
 
         self.assertEqual(apartment.apartment_location, "Arima")
         self.assertEqual(len(apartment.amenities),2)
         self.assertEqual(apartment.landlord_id, landlord.user_id)
+
+
+#
+class TenantIntegrationTest(unittest.TestCase):
+
+    def test_create_review_of_apartment(self):
+        
+        landlord= create_user("sam", "sam@mail.com", "sampass", "landlord", "(868) 891-0111")
+
+        create_amenity("2 Large Bed Rooms")
+        create_amenity("Large Yard")     
+
+        apartment3=create_listing(landlord.user_id, "Apartment3", "Barataria", 10, 8, "Luxury apartments", [{"amenity_name": "2 Large Bed Rooms", "quantity": 18}, {"amenity_name": "Large Yard", "quantity": 1}])
+
+        tenant= create_user("smith", "smith@mail.com", "smithpass", "tenant", None, apartment_id=apartment3.apartment_id)
+
+        add_tenant_to_apartment(tenant.user_id, apartment3.apartment_id)
+
+        review= create_review(tenant.user_id, apartment3.apartment_id, "Beautiful apartment complex")
+
+        self.assertEqual(apartment3.apartment_location, "Barataria")
+        self.assertEqual(len(apartment3.amenities),2)
+        self.assertEqual(apartment3.landlord_id, landlord.user_id)
+        self.assertEqual(tenant.name, "smith")
+        self.assertEqual(review.apartment_id, apartment3.apartment_id)
+        
+
+
 
 
 
