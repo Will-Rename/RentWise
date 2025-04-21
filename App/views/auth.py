@@ -3,19 +3,31 @@ from flask_jwt_extended import jwt_required, current_user, unset_jwt_cookies, se
 
 
 from.index import index_views
-
+from App.models import User, Tenant, Landlord, Apartment, Amenity, ApartmentAmenity, Review
 from App.controllers import (
     login
 )
 
 auth_views = Blueprint('auth_views', __name__, template_folder='../templates')
 
+def get_all_users():
+    return User.query.all()
 
 
 
 '''
 Page/Action Routes
 '''    
+
+@auth_views.route('/login', methods=['GET'])
+def login_page():
+    return render_template('login.html')
+
+@auth_views.route('/signup', methods=['GET'])
+def signup_page():
+    return render_template('signup.html')
+
+
 @auth_views.route('/users', methods=['GET'])
 def get_user_page():
     users = get_all_users()
@@ -24,13 +36,13 @@ def get_user_page():
 @auth_views.route('/identify', methods=['GET'])
 @jwt_required()
 def identify_page():
-    return render_template('message.html', title="Identify", message=f"You are logged in as {current_user.id} - {current_user.username}")
+    return render_template('message.html', title="Identify", message=f"You are logged in as {current_user.id} - {current_user.name}")
     
 
 @auth_views.route('/login', methods=['POST'])
 def login_action():
     data = request.form
-    token = login(data['username'], data['password'])
+    token = login(data['name'], data['password'])
     response = redirect(request.referrer)
     if not token:
         flash('Bad username or password given'), 401
@@ -53,7 +65,7 @@ API Routes
 @auth_views.route('/api/login', methods=['POST'])
 def user_login_api():
   data = request.json
-  token = login(data['username'], data['password'])
+  token = login(data['name'], data['password'])
   if not token:
     return jsonify(message='bad username or password given'), 401
   response = jsonify(access_token=token) 
@@ -63,7 +75,7 @@ def user_login_api():
 @auth_views.route('/api/identify', methods=['GET'])
 @jwt_required()
 def identify_user():
-    return jsonify({'message': f"username: {current_user.username}, id : {current_user.id}"})
+    return jsonify({'message': f"username: {current_user.name}, id : {current_user.id}"})
 
 @auth_views.route('/api/logout', methods=['GET'])
 def logout_api():
