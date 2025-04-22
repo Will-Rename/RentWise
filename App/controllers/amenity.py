@@ -6,7 +6,7 @@ def create_amenity(amenity_name):
     existing_amenity = Amenity.query.filter_by(amenity_name=amenity_name).first() 
     
     if existing_amenity:
-        print("This amenity is already present")    
+        print(f"This amenity: {amenity_name} is already present")    
         return None
     
     new_amenity = Amenity(amenity_name=amenity_name)
@@ -19,14 +19,18 @@ def create_amenity(amenity_name):
 def delete_amenity(amenity_id):
     valid_amenity = Amenity.query.get(amenity_id)
     
-    if valid_amenity is None:
-        print ("This is not a valid amenity")
+    if not valid_amenity:
+        print (f"The amenity with id: {amenity_id} was not found")
         return None
     
+    if valid_amenity.apartment_amenities:
+        print(f"Cannot delete amenity {valid_amenity.amenity_name} is presently in use")
+        return None
+
     db.session.delete(valid_amenity)
     db.session.commit()
     print(f"The amenity {valid_amenity.amenity_name} was deleted")
-
+    return valid_amenity
 
 #get_all_amenities
 def get_all_amenities():
@@ -46,8 +50,11 @@ def get_amenity(amenity_id):
     amenity = Amenity.query.get(amenity_id)
 
     if not amenity:
-        print("This is not valid amenity")
+        print (f"The amenity with id: {amenity_id} was not found")
         return None
     
     print(f"Amenity {amenity} was found")
-    return amenity
+    return {
+            "amenity_id": amenity.amenity_id,
+            "amenity_name": amenity.amenity_name,
+        }

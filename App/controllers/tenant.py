@@ -1,6 +1,7 @@
 from App.models import User, Tenant, Review
 from App.database import db
 
+'''
 #create_tenant
 def create_tenant(name, email, password, apartment_id):
     if User.query.filter_by(email=email).first():
@@ -12,16 +13,17 @@ def create_tenant(name, email, password, apartment_id):
         db.session.commit()
         print(f"Tenant {new_tenant.name} has been created")
         return new_tenant
+'''
 
 #create_review - application main feature 2
-def create_review(tenant_id, apartment_id, review):
+def create_review(tenant_id, apartment_id, review_text):
     valid_tenant= Tenant.query.get(tenant_id)
 
     if not valid_tenant:
         print("This is not a valid tenant")
         return None
 
-    new_review= Review(tenant_id=tenant_id, apartment_id=apartment_id, review=review)
+    new_review= Review(tenant_id=tenant_id, apartment_id=apartment_id, review_text=review_text)
     db.session.add(new_review)
     db.session.commit()
     print("Tenant created a review")
@@ -51,10 +53,10 @@ def delete_tenant_review(tenant_id, review_id):
         print ("This is not a valid review")
         return None
     
-    if valid_tenant.id != valid_review.tenant_id:
+    if valid_tenant.user_id != valid_review.tenant_id:
         print("This tenant is not authorized to delete this review")
         return None
     
     db.session.delete(valid_review)
     db.session.commit()
-    print(f"Tenant {valid_tenant.name} delected review {valid_review}")
+    print(f"Tenant {valid_tenant.name} deleted review {valid_review.review_id}")

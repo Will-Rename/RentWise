@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+{% block title %}Login{% endblock %}
+{% block page %}Login{% endblock %}
+
+{% block link %}
+  <ul id="nav-mobile" class="right">
+    <li><a href="/signup">Sign Up</a></li>
+  </ul>
+{% endblock %}
+
+{% block content %}
+  <div class="row login-page">
+    <!-- Left: Login Form -->
+    <div class="col s12 m6 login-form-section">
+      <div class="form-wrapper">
+        <h4>Login</h4>
+        <form method="POST" action="/login">
+          <div class="input-field">
+            <input id="username" name="username" type="text" class="validate" required>
+            <label for="username">Username</label>
+          </div>
+
+          <div class="input-field">
+            <input id="password" name="password" type="password" class="validate" required>
+            <label for="password">Password</label>
+          </div>
+
+          <div class="login-actions">
+            <button class="btn waves-effect waves-light btn-login" type="submit">Login</button>
+            <a href="/signup" class="signup-link">Don't have an account?</a>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Right: Image -->
+    <div class="col s12 m6 hide-on-small-only image-section">
+      <img src="{{ url_for('static', filename='images/login-visual.jpg') }}" alt="Login Visual" class="responsive-img">
+    </div>
+  </div>
+{% endblock %}

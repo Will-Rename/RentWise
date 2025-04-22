@@ -1,70 +1,66 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
-  
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-     <!--Import Google Icon Font-->
+    <!--Import Google Icon Font-->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <!-- Compiled and minified CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
-    <!--Let browser know website is optimized for mobile-->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>{% block title %}{% endblock %}</title>
-
+    <title>{% block title %}RentWise{% endblock %}</title>
+    {% block head %}{% endblock %}
   </head>
   <body>
-    
-      <nav class="purple">
+      <nav class="orange">
           <div class="nav-wrapper">
-              <a href="#!" class="brand-logo center">{% block page %}{% endblock %}</a>
-              <ul id="nav-mobile" class="left">
-                  <li><a href="/">Home</a></li>
-                  <li><a href="/users">Users Jinja</a></li>
-                  {% if is_authenticated %}
-                    <li><a href="/identify">Identify</a></li>
-                  {% endif %}
-                  <li><a href="/static/users">Users JS</a></li>
-              </ul>
+            <!-- Logo Image -->
+            <a href="/" class="left">
+              <img src="{{ url_for('static', filename='images/logo.png') }}" alt="RentWise Logo" class="logo-img">              
+            </a>
+            <ul class="left">
+              <li><a href="/">RentWise</a></li>
+            </ul>
+            <ul id="nav-mobile" class="right">
               {% if is_authenticated %}
-              <ul id="nav-mobile" class="right">
+                <li><a href="/static/users">Users JS</a></li>
                 <li><a href="/logout">Logout</a></li>
-              </ul>
               {% else %}
-              <form class="right navbar-form" method="POST" action="/login" style="display: flex; flex-wrap: nowrap; align-items: center; margin-right: 10px;">
-                  <div class="input-field" style="margin-right: 10px;">
-                      <input placeholder="username" value="bob" name="username" type="text" class="validate" required>
-                      <label for="username">username</label>
-                  </div>
-                  <div class="input-field" style="margin-right: 10px;">
-                      <input placeholder="password"value="bobpass" name="password" type="password" class="validate" required>
-                      <label for="password">Password</label>
-                  </div>
-                  <button type="submit" class="btn waves-effect waves-light">Login</button>
-              </form>
+                <li><a href="{{ url_for('auth_views.login_action') }}">Login</a></li>
+                <li><a href="{{ url_for('auth_views.signup_page') }}">Signup</a></li>
               {% endif %}
+            </ul>
               
           </div>
       </nav>
       <style>
-          .navbar-form label {
-              color: white !important;
+        .logo-img {
+          height: 65px; 
+          padding: 1px 0; 
+          margin-left: 15px;
+          object-fit: contain;
           }
       </style>
 
-    <div class="container" id="content">{% block content %}{% endblock %}</div>
+    <main class="container" id="content">
+      {% block content %}{% endblock %}
+    </main>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    
+    {% block scripts %}{% endblock %}
+    
     <script>
-       M.AutoInit();
-
-        {% with messages = get_flashed_messages() %}
-          {% if messages %}
-              {% for message in messages %}
-              M.toast({html: '{{message}}'})
-              {% endfor %}
-          {% endif %}
-        {% endwith %}
-       
+      document.addEventListener('DOMContentLoaded', function() {
+        M.AutoInit();
+        var messages = JSON.parse('{{ get_flashed_messages()|tojson|safe }}');
+        if (messages && messages.length > 0) {
+          messages.forEach(function(message) {
+            M.toast({html: message, displayLength: 3000});
+          });
+        }
+      });
     </script>
   </body>
 </html>
