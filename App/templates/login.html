@@ -9,24 +9,33 @@
 {% endblock %}
 
 {% block content %}
-<main class="container" style="margin-top: 100px;">
-  <form class="card col s12" id="loginForm" method="POST" action="/login" style="padding:1em">
-    <div class="row">
-      <div class="input-field col s12">
-        <input placeholder="Enter Name" name="name" type="text" class="validate">
-        <label for="name">Name</label>
+  <div class="row login-page">
+    <!-- Left: Login Form -->
+    <div class="col s12 m6 login-form-section">
+      <div class="form-wrapper">
+        <h4>Login</h4>
+        <form method="POST" action="/login">
+          <div class="input-field">
+            <input id="email" name="username" type="email" class="validate" required>
+            <label for="email">Email</label>
+          </div>
+
+          <div class="input-field">
+            <input id="password" name="password" type="password" class="validate" required>
+            <label for="password">Password</label>
+          </div>
+
+          <div class="login-actions">
+            <button class="btn waves-effect waves-light btn-login" type="submit">Login</button>
+            <a href="/signup" class="signup-link">Don't have an account?</a>
+          </div>
+        </form>
       </div>
     </div>
 
-    <div class="row">
-      <div class="input-field col s12">
-        <input placeholder="Password" name="password" type="password" class="validate">
-        <label for="password">Password</label>
-      </div>
+    <!-- Right: Image -->
+    <div class="col s12 m6 hide-on-small-only image-section">
+      <img src="{{ url_for('static', filename='images/login-visual.jpg') }}" alt="Login Visual" class="responsive-img">
     </div>
-    <div class="card-action row">
-      <input type="submit" class="btn waves-effect waves-light purple" value="Login">
-    </div>
-  </form>
-</main>
+  </div>
 {% endblock %}

@@ -12,24 +12,36 @@
     <title>{% block title %}RentWise{% endblock %}</title>
     {% block head %}{% endblock %}
   </head>
-  <body class="grey lighten-5">
-    <nav class="orange" style="width: 100%; height: 20vh;">
-      <div class="nav-wrapper" style="padding: 0 2rem;">
-        <!-- Home Icon -->
-        <a href="/" class="left">
-          <i class="material-icons">home</i>
-        </a>
-        <ul id="nav-mobile" class="right">
-          {% if is_authenticated %}
-            <li><span class="hide-on-small-only">Hi, {{current_user.name}}</span></li>
-            <li><a href="/logout" class="waves-effect waves-light btn-small orange darken-2">Logout</a></li>
-          {% else %}
-            <li><a href="/login">Login</a></li>
-            <li><a href="/signup">Signup</a></li>
-          {% endif %}
-        </ul>
-      </div>
-    </nav>
+  <body>
+      <nav class="orange">
+          <div class="nav-wrapper">
+            <!-- Logo Image -->
+            <a href="/" class="left">
+              <img src="{{ url_for('static', filename='images/logo.png') }}" alt="RentWise Logo" class="logo-img">              
+            </a>
+            <ul class="left">
+              <li><a href="/">RentWise</a></li>
+            </ul>
+            <ul id="nav-mobile" class="right">
+              {% if is_authenticated %}
+                <li><a href="/static/users">Users JS</a></li>
+                <li><a href="/logout">Logout</a></li>
+              {% else %}
+                <li><a href="{{ url_for('auth_views.login_action') }}">Login</a></li>
+                <li><a href="#">Signup</a></li>
+              {% endif %}
+            </ul>
+              
+          </div>
+      </nav>
+      <style>
+        .logo-img {
+          height: 65px; 
+          padding: 1px 0; 
+          margin-left: 15px;
+          object-fit: contain;
+          }
+      </style>
 
     <main class="container" id="content">
       {% block content %}{% endblock %}
