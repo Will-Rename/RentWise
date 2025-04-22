@@ -1,52 +1,73 @@
 import click, pytest, sys
 from flask import Flask
 from flask.cli import with_appcontext, AppGroup
+import json
 
 from App.database import db, get_migrate
 from App.models import User
 from App.main import create_app
 from App.controllers import (
     create_user,
-    get_all_users_json,
-    get_all_users,
+    #get_all_users_json,
+    #get_all_users,
     initialize,
-    create_landlord,
-    create_tenant,
-    get_all_landlords,
-    get_all_tenants,
+    #get_all_landlords,
+    #get_all_tenants,
     create_amenity,
-    get_all_amenities,
-    get_amenity,
-    delete_amenity,
+    #get_all_amenities,
+    #get_amenity,
+    #delete_amenity,
     create_listing,
-    list_all_apartments,
-    get_apartments,
-    list_apartment_amenities,
-    get_apartment_reviews,
+    #list_all_apartments,
+    #get_apartments,
+    #list_apartment_amenities,
+    #get_apartment_reviews,
     create_review,
-    get_tenant_reviews,
-    delete_tenant_review
+    #get_tenant_reviews,
+    #delete_tenant_review
 )
+
 
 app = create_app()
 migrate = get_migrate(app)
+
+if __name__ == "__main__":
+    app.run()
 
 @app.cli.command("init", help="Creates and initializes the database")
 def init():
     initialize()
     print('database initialized')
 
+
+# The order to run the commands - has default values, you don't have to input
+# flask init
+# flask landlord create_landlord <details>
+# flask amenity create <name>
+# flask apartment create <details>
+# flask tenant create_tenant <details> 
+# flask review create <details>
+
 '''
 User Commands
 '''
+
+'''
 user_cli = AppGroup('user', help='User object commands') 
 
-@user_cli.command("create", help="Creates a user")
-@click.argument("username", default="rob")
+#flask user create_landlord <details>
+@user_cli.command("create_landlord", help="Creates a user")
+@click.argument("name", default="rob")
+@click.argument("email", default="rod@mail.com")
 @click.argument("password", default="robpass")
-def create_user_command(username, password):
-    create_user(username, password)
-    print(f'{username} created!')
+@click.argument("type", default="landlord")
+@click.argument("phone_number", default="(818) 222-2222")
+def create_user_command(name, email, password, type, phone_number):
+    create_user(name, email, password, type, phone_number)
+    #print(f'User: {name} created!')
+
+
+app.cli.add_command(user_cli)
 
 @user_cli.command("list", help="Lists users in the database")
 @click.argument("format", default="string")
@@ -57,11 +78,25 @@ def list_user_command(format):
         print(get_all_users_json())
 
 app.cli.add_command(user_cli)
+'''
 
 '''
 Landlord Commands
 '''
+
 landlord_cli = AppGroup('landlord', help='Landlord object commands')
+
+#flask landlord create_landlord <details> 
+@landlord_cli.command("create_landlord", help="Creates a user")
+@click.argument("name", default="rob")
+@click.argument("email", default="rod@mail.com")
+@click.argument("password", default="robpass")
+@click.argument("type", default="landlord")
+@click.argument("phone_number", default="(818) 222-2222")
+def create_user_command(name, email, password, type, phone_number):
+    create_user(name, email, password, type, phone_number)
+    #print(f'User: {name} created!')
+'''
 
 @landlord_cli.command("create", help="Creates a landlord")
 @click.argument("username", default="landlord")
@@ -73,14 +108,37 @@ def create_landlord_command(username, password):
 @landlord_cli.command("list", help="Lists all landlords")
 def list_landlords_command():
     print(get_all_landlords())
+'''
 
 app.cli.add_command(landlord_cli)
+
 
 '''
 Tenant Commands
 '''
 tenant_cli = AppGroup('tenant', help='Tenant object commands')
 
+#flask tenant create_tenant <details> 
+@tenant_cli.command("create_tenant", help="Creates a user")
+@click.argument("name", default="sam")
+@click.argument("email", default="sam@mail.com")
+@click.argument("password", default="sampass")
+#@click.argument("type", default="tenant")
+#@click.argument("phone_number", default= None)
+@click.argument("apartment_id", default= 1)
+def create_user_command(name, email, password, apartment_id):
+    create_user(name, email, password, type="tenant", apartment_id=apartment_id)
+
+'''
+#flask tenant add_tenant_to_apt
+@tenant_cli.command("add_tenant_to_apt", help="Adds the tenant to an apartment")
+@click.argument("tenant_id", default=10)
+@click.argument("apartment_id", default= 1)
+def add_tenant_to_apartment_command(tenant_id, apartment_id):
+    add_tenant_to_apartment(tenant_id, apartment_id)
+'''
+
+'''
 @tenant_cli.command("create", help="Creates a tenant")
 @click.argument("username", default="tenant")
 @click.argument("password", default="tenantpass")
@@ -91,21 +149,26 @@ def create_tenant_command(username, password):
 @tenant_cli.command("list", help="Lists all tenants")
 def list_tenants_command():
     print(get_all_tenants())
-
+'''
 app.cli.add_command(tenant_cli)
+
+
+
 
 '''
 Amenity Commands
 '''
 amenity_cli = AppGroup('amenity', help='Amenity object commands')
 
+#flask amenity create <name>
 @amenity_cli.command("create", help="Creates a new amenity")
-@click.argument("name", required=True)
+@click.argument("name", default = "Gym")
 def create_amenity_command(name):
     amenity = create_amenity(name)
-    if amenity:
-        print(f'Amenity {name} created!')
+    #if amenity:
+        #print(f'Amenity {name} created!')
 
+'''
 @amenity_cli.command("list", help="Lists all amenities")
 def list_amenities_command():
     print(get_all_amenities())
@@ -121,25 +184,36 @@ def get_amenity_command(id):
 def delete_amenity_command(id):
     delete_amenity(id)
 
+'''
 app.cli.add_command(amenity_cli)
 
+
 '''
-Apartment Commands
+#Apartment Commands
 '''
 apartment_cli = AppGroup('apartment', help='Apartment object commands')
 
+#flask apartment create
 @apartment_cli.command("create", help="Creates a new apartment listing")
-@click.option("--landlord-id", required=True, type=int, help="ID of the landlord")
-@click.option("--name", required=True, help="Name of the apartment")
-@click.option("--location", required=True, help="Location of the apartment")
-@click.option("--units-available", required=True, type=int, help="Number of available units")
-@click.option("--units-not-available", required=True, type=int, help="Number of unavailable units")
-@click.option("--details", required=True, help="Details about the apartment")
-def create_apartment_command(landlord_id, name, location, units_available, units_not_available, details):
-    apartment = create_listing(landlord_id, name, location, units_available, units_not_available, details, [])
-    if apartment:
-        print(f'Apartment listing {name} created!')
+#@click.option("--landlord-id", required=True, type=int, help="ID of the landlord")
+@click.option("--landlord-id", default= 1, type=int, help="ID of the landlord")
+@click.option("--name",  default= "john", help="Name of the apartment")
+@click.option("--location",  default= "Mt.Hope", help="Location of the apartment")
+@click.option("--units-available", default= 10, type=int, help="Number of available units")
+@click.option("--units-not-available", default=1, type=int, help="Number of unavailable units")
+@click.option("--details",  default= "Safe place", help="Details about the apartment")
+@click.option("--amenities", default= '[{"amenity_name": "Gym", "quantity": 1}]', help="list of amenities name and quantity")
+def create_apartment_command(landlord_id, name, location, units_available, units_not_available, details, amenities):
+    try:
+        amenities = json.loads(amenities)
+    except json.JSONDecodeError:
+        print("Invalid format")
+        return
+    apartment = create_listing(landlord_id, name, location, units_available, units_not_available, details, amenities)
+    #if apartment:
+        #print(f'Apartment listing {name} created!')
 
+'''
 @apartment_cli.command("list", help="Lists all apartments or filtered by landlord")
 @click.option("--landlord-id", type=int, help="Filter by landlord ID")
 def list_apartments_command(landlord_id):
@@ -159,22 +233,26 @@ def list_apartment_amenities_command(apartment_id):
     amenities = list_apartment_amenities(apartment_id)
     print(amenities)
 
+'''
 app.cli.add_command(apartment_cli)
 
+
 '''
-Review Commands
+#Review Commands
 '''
 review_cli = AppGroup('review', help='Review object commands')
 
+#flask review create <details>
 @review_cli.command("create", help="Creates a new review")
-@click.option("--tenant-id", required=True, type=int, help="ID of the tenant")
-@click.option("--apartment-id", required=True, type=int, help="ID of the apartment")
-@click.option("--review-text", required=True, help="The review text")
+@click.option("--tenant-id", default=2, type=int, help="ID of the tenant")
+@click.option("--apartment-id", default=1, type=int, help="ID of the apartment")
+@click.option("--review-text", default= "Beautiful apartment complex", help="The review text")
 def create_review_command(tenant_id, apartment_id, review_text):
     review = create_review(tenant_id, apartment_id, review_text)
     if review:
         print(f'Review created for apartment {apartment_id}!')
 
+'''
 @review_cli.command("list", help="Lists reviews by apartment or tenant")
 @click.option("--apartment-id", type=int, help="Filter by apartment ID")
 @click.option("--tenant-id", type=int, help="Filter by tenant ID")
@@ -193,8 +271,9 @@ def list_reviews_command(apartment_id, tenant_id):
 @click.option("--review-id", required=True, type=int, help="ID of the review to delete")
 def delete_review_command(tenant_id, review_id):
     delete_tenant_review(tenant_id, review_id)
-
+'''
 app.cli.add_command(review_cli)
+
 
 '''
 Test Commands
