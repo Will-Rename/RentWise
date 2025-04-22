@@ -180,7 +180,15 @@ class Review(db.Model):
     review_text = db.Column(db.String(200), nullable=False)
     apartment_id = db.Column(db.Integer, db.ForeignKey('apartment.apartment_id'), nullable=False)
     tenant_id = db.Column(db.Integer, db.ForeignKey('tenant.user_id'), nullable=False)
-
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+    
     def __repr__(self):
         return f'<Review {self.review_id} : {self.review_text} Creator : {self.tenant_id}>'
     
+    @property
+    def days_ago(self):
+        """Calculate days since review was created"""
+        from datetime import datetime
+        delta = datetime.now() - self.created_at
+        return delta.days
+

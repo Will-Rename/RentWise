@@ -1,3 +1,180 @@
 html {
     padding: 0;
 }
+
+/* Base Styles */
+body {
+    font-family: 'Roboto', sans-serif;
+    font-size: 16px;
+    color: #212121;
+    background-color: #F4F4F4;
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 500;
+}
+
+/* Navigation */
+nav {
+    background-color: #FF9800 !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    height: 20vh;
+}
+
+nav .brand-logo,
+nav .nav-wrapper a {
+    font-weight: 500;
+}
+
+/* Buttons */
+.btn, .btn-small, .btn-large {
+    background-color: #FF9800;
+}
+
+.btn:hover, .btn-small:hover, .btn-large:hover {
+    background-color: #FFB74D;
+}
+
+.btn.active {
+    background-color: #4CAF50 !important;
+    cursor: default;
+}
+
+.btn.active:hover {
+    background-color: #4CAF50 !important;
+}
+
+/* Tenant-specific Styles */
+.tenant-actions {
+    margin: 1rem 0;
+}
+
+/* Cards */
+.card {
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    background-color: #FFFFFF;
+    margin: 1rem 0;
+}
+
+.card .card-content {
+    padding: 1.5rem;
+}
+
+/* Reviews Page Specific */
+.apartment-image {
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    width: 45vw !important;
+    height: 35vh !important;
+}
+
+.reviews-section {
+    height: calc(100vh - 20vh);
+    overflow-y: auto;
+    padding-right: 1rem;
+}
+
+.reviews-list {
+    height: calc(100vh - 35vh);
+}
+
+.review-card {
+    margin: 1rem 0;
+    position: relative;
+    transition: transform 0.2s;
+}
+
+.review-card.partial {
+    height: 80px;
+    overflow: hidden;
+}
+
+.review-card:hover {
+    transform: translateY(-2px);
+}
+
+.review-actions {
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.review-card:hover .review-actions {
+    opacity: 1;
+}
+
+.review-author {
+    font-weight: 500;
+    margin: 0;
+}
+
+.edit-text {
+    margin: 0.5rem 0;
+    min-height: 6rem;
+}
+
+/* Amenities Section */
+.amenities-section i.tiny {
+    color: #4CAF50;
+    margin-right: 0.5rem;
+}
+
+/* Circle Images */
+.circle-image {
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.circle-image.landlord {
+    width: 100px;
+    height: 100px;
+    margin: 1rem;
+}
+
+.circle-image.tenant {
+    width: 50px;
+    height: 50px;
+}
+
+/* Dividers */
+.divider {
+    background-color: rgba(0,0,0,0.1);
+    margin: 1rem 0;
+}
+
+/* Modal */
+.modal {
+    border-radius: 8px;
+}
+
+.modal .modal-content {
+    padding: 2rem;
+}
+
+.modal .modal-footer {
+    padding: 1rem 2rem;
+}
+
+/* Add Review Area */
+#addReviewArea {
+    margin: 1rem 0;
+    padding: 1rem;
+    border-radius: 8px;
+    background-color: rgba(255,255,255,0.5);
+}
+
+/* Toast Messages */
+.toast {
+    background-color: #323232;
+    border-radius: 24px;
+    font-weight: 500;
+}
+
+.toast.green {
+    background-color: #4CAF50;
+}
+
+.toast.red {
+    background-color: #F44336;
+}
