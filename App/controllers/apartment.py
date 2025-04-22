@@ -109,3 +109,5 @@ def list_apartment_amenities(apartment_id):
         for a in apartment_amenities
     ]
     return list_of_apartment_amenities
+
+

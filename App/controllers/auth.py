@@ -5,7 +5,7 @@ from App.models import User
 def login(name, password):
   user = User.query.filter_by(name=name).first()
   if user and user.check_password(password):
-    return create_access_token(identity=user.user_id)
+    return create_access_token(identity=str(user.user_id))
   return None
 
 
