@@ -1,13 +1,12 @@
 from flask import Blueprint, render_template, jsonify, request
 from flask_jwt_extended import jwt_required, current_user
-from App.models import Review, Apartment, ReviewVote
+from App.models import Review, Apartment
 from App.database import db
 from App.controllers import (
     create_review,
     delete_tenant_review,
     get_apartment_reviews,
-    get_tenant_reviews,
-    vote_on_review
+    get_tenant_reviews
 )
 
 reviews_views = Blueprint('reviews_views', __name__, template_folder='../templates')
@@ -54,17 +53,3 @@ def delete_review_api(review_id):
     if result:
         return jsonify({'message': 'Review deleted successfully'})
     return jsonify({'error': 'Failed to delete review'}), 400
-
-@reviews_views.route('/api/reviews/<int:review_id>/vote', methods=['POST'])
-@jwt_required()
-def vote_review_api(review_id):
-    if current_user.type != 'tenant':
-        return jsonify({'error': 'Only tenants can vote on reviews'}), 403
-        
-    data = request.json
-    vote_type = data['vote']  # 1 for upvote, -1 for downvote
-    
-    result = vote_on_review(current_user.user_id, review_id, vote_type)
-    if result:
-        return jsonify({'message': 'Vote recorded successfully'})
-    return jsonify({'error': 'Failed to record vote'}), 400

@@ -78,33 +78,6 @@ nav .nav-wrapper a {
     opacity: 1;
 }
 
-.review-votes {
-    margin-top: 1rem;
-}
-
-.review-votes .divider-vertical {
-    margin: 0 0.5rem;
-    color: rgba(0,0,0,0.2);
-}
-
-.vote {
-    cursor: pointer;
-    transition: color 0.2s ease;
-}
-
-.vote.upvote.green-text {
-    color: #4CAF50 !important;
-}
-
-.vote.downvote.red-text {
-    color: #F44336 !important;
-}
-
-.vote.disabled {
-    cursor: not-allowed;
-    opacity: 0.5;
-}
-
 /* Circle Images */
 .circle-image.landlord {
     width: 20% !important;

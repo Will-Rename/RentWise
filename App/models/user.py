@@ -174,13 +174,6 @@ class ApartmentAmenity(db.Model):
         return f'<ApartmentAmenity {self.apartment_id} - {self.amenity_id}: qty = {self.quantity}>'
 
 
-class ReviewVote(db.Model):
-    __tablename__ = 'review_vote'
-    tenant_id = db.Column(db.Integer, db.ForeignKey('tenant.user_id'), primary_key=True)
-    review_id = db.Column(db.Integer, db.ForeignKey('review.review_id'), primary_key=True)
-    vote_type = db.Column(db.Integer, nullable=False)  # 1 for upvote, -1 for downvote
-
-
 class Review(db.Model):
     __tablename__ = 'review'
     review_id = db.Column(db.Integer, primary_key=True)
@@ -189,9 +182,6 @@ class Review(db.Model):
     tenant_id = db.Column(db.Integer, db.ForeignKey('tenant.user_id'), nullable=False)
     created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
     
-    # Relationships
-    votes = db.relationship('ReviewVote', backref='review', lazy=True)
-
     def __repr__(self):
         return f'<Review {self.review_id} : {self.review_text} Creator : {self.tenant_id}>'
     
@@ -201,19 +191,4 @@ class Review(db.Model):
         from datetime import datetime
         delta = datetime.now() - self.created_at
         return delta.days
-    
-    @property
-    def upvotes(self):
-        """Count number of upvotes"""
-        return sum(1 for vote in self.votes if vote.vote_type == 1)
-    
-    @property
-    def downvotes(self):
-        """Count number of downvotes"""
-        return sum(1 for vote in self.votes if vote.vote_type == -1)
-    
-    def get_user_vote(self, tenant_id):
-        """Get the vote type for a specific tenant"""
-        vote = next((v for v in self.votes if v.tenant_id == tenant_id), None)
-        return vote.vote_type if vote else 0
 

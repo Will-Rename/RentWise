@@ -85,12 +85,12 @@
                             <div class="col s2">
                                 <div class="circle-image grey lighten-3" style="width: 50px; height: 50px; border-radius: 50%;"></div>
                             </div>
-                            <div class="col s7">
+                            <div class="col s8">
                                 <p class="review-author">{{review.tenant.name}}</p>
                                 <p class="grey-text">{{review.days_ago}} days ago</p>
                             </div>
                             {% if is_authenticated and current_user.user_id == review.tenant_id %}
-                            <div class="col s3 review-actions">
+                            <div class="col s2 review-actions">
                                 <span class="edit-delete-buttons">
                                     <a class="edit-review" href="#">Edit</a> |
                                     <a class="delete-review" href="#">Delete</a>
@@ -105,21 +105,6 @@
                         <div class="review-content">
                             <p class="review-text">{{review.review_text}}</p>
                             <textarea class="edit-text materialize-textarea" style="display: none;">{{review.review_text}}</textarea>
-                        </div>
-                        <div class="review-votes">
-                            {% if is_authenticated and current_user.type == 'tenant' %}
-                                <a class="vote upvote {% if review.user_vote == 1 %}green-text{% endif %} {% if review.user_has_voted %}disabled{% endif %}" href="#">
-                                    <i class="material-icons tiny">arrow_upward</i>
-                                </a>
-                            {% endif %}
-                            <span>{{review.upvotes}}</span>
-                            <span class="divider-vertical">|</span>
-                            {% if is_authenticated and current_user.type == 'tenant' %}
-                                <a class="vote downvote {% if review.user_vote == -1 %}red-text{% endif %} {% if review.user_has_voted %}disabled{% endif %}" href="#">
-                                    <i class="material-icons tiny">arrow_downward</i>
-                                </a>
-                            {% endif %}
-                            <span>{{review.downvotes}}</span>
                         </div>
                     </div>
                 </div>
@@ -277,31 +262,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
         });
-    });
-
-    // Vote handlers
-    document.querySelectorAll('.vote').forEach(function(vote) {
-        if (!vote.classList.contains('disabled')) {
-            vote.addEventListener('click', function(e) {
-                e.preventDefault();
-                const reviewId = this.closest('.review-card').dataset.reviewId;
-                const voteType = this.classList.contains('upvote') ? 1 : -1;
-                
-                fetch(`/api/reviews/${reviewId}/vote`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        vote: voteType
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    location.reload();
-                });
-            });
-        }
     });
 });
 </script>
