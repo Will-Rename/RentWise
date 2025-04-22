@@ -1,0 +1,6 @@
+id,name,email,password,type,phone_number,apartment_id
+1,John,john@email.com,scrypt:32768:8:1$JGD9348fhsd2$7a8f9b2d6c4e01a3b5f7d9e2c4a6b8d0e1f3a5c7b9d2e4f6a8b0c2d4e6f8a1b3c5d7e9f0a2b4c6d8e,landlord,123-456-7890,
+2,Jane,jane@email.com,scrypt:32768:8:1$KJH7894ghfd3$6b9c8d1e3f5a7b2d4e6f8a0b1c3d5e7f9a2b4c6d8e0f1a3b5c7d9e2f4a6b8c0d,landlord,098-765-4321,
+3,Bob,bob@email.com,scrypt:32768:8:1$BGF5632kjhg1$5c7d9e2f4a6b8c0d1e3f5a7b9c2d4e6f8a0b1c3d5e7f9a2b4c6d8e0f1a3b,landlord,111-222-3333,
+4,Alice,alice@email.com,scrypt:32768:8:1$ALC7890poiu5$9e2f4a6b8c0d1e3f5a7b9c2d4e6f8a0b1c3d5e7f9a2b4c6d8e0f1a3b5c,tenant,,1
+5,Jas,Jas@email.com,scrypt:32768:8:1$JAS4567mnbv2$8d0e1f3a5c7b9d2e4f6a8b0c2d4e6f8a1b3c5d7e9f0a2b4c6d8e0f1a3b5c7d,tenant,,2

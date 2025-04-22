@@ -1,0 +1,296 @@
+{% extends "layout.html" %}
+{% block title %}Reviews - {{apartment.apartment_name}}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Left Side -->
+    <div class="col s6">
+        <div class="apartment-image grey lighten-2" style="width: 90%; height: 35vh; margin-bottom: 1rem;"></div>
+        <h4 class="apartment-name">{{apartment.apartment_name}}</h4>
+        <div class="divider" style="width: 90%; margin: 1rem 0;"></div>
+        
+        <!-- Tenant-specific actions -->
+        {% if is_authenticated and current_user.type == 'tenant' %}
+        <div class="tenant-actions" style="width: 90%; margin-bottom: 1rem;">
+            <a class="btn orange waves-effect waves-light {% if current_user.apartment_id == apartment.apartment_id %}active{% endif %}"
+               {% if current_user.apartment_id != apartment.apartment_id %}href="#requestModal"{% endif %}>
+                {% if current_user.apartment_id == apartment.apartment_id %}
+                    Current Tenant
+                {% else %}
+                    Request to Rent
+                {% endif %}
+            </a>
+        </div>
+        {% endif %}
+        
+        <!-- Landlord Card -->
+        <div class="card horizontal" style="width: 90%">
+            <div class="card-image">
+                <div class="circle-image grey lighten-3" style="width: 100px; height: 100px; border-radius: 50%; margin: 1rem;"></div>
+            </div>
+            <div class="card-stacked">
+                <div class="card-content">
+                    <p>Meet the Landlord:</p>
+                    <p><b>{{apartment.landlord.name}}</b></p>
+                    <p>Phone: {{apartment.landlord.phone_number}}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Apartment Details -->
+        <h5>Apartment Details</h5>
+        <div class="divider" style="width: 90%; margin: 1rem 0;"></div>
+        <div style="width: 90%">
+            <p>
+                <span>Location: {{apartment.apartment_location}}</span>
+                <span class="right">Units Available: {{apartment.number_of_units_available}}</span>
+            </p>
+            <p class="apartment-details">{{apartment.apartment_details}}</p>
+            <div class="divider" style="margin: 1rem 0;"></div>
+            
+            <!-- Amenities -->
+            <div class="amenities-section">
+                <h6>Amenities</h6>
+                <div class="row">
+                    {% for amenity in apartment.amenities %}
+                        <div class="col s6">
+                            <p><i class="material-icons tiny">check_circle</i> {{amenity.amenity.amenity_name}} ({{amenity.quantity}})</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Side - Reviews -->
+    <div class="col s6">
+        <div class="reviews-section">
+            <div class="row">
+                <h5 class="left">Reviews</h5>
+                <div class="right">
+                    {% if is_authenticated and current_user.type == 'tenant' %}
+                        <a class="btn-small orange waves-effect waves-light" href="#" id="showAddReview">
+                            <i class="material-icons left">rate_review</i>Add Review
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Add Review Input Area -->
+            <div id="addReviewArea" class="card" style="display: none;">
+                <div class="card-content">
+                    <span class="card-title">Write a Review</span>
+                    <div class="input-field">
+                        <textarea id="new_review_text" class="materialize-textarea"></textarea>
+                        <label for="new_review_text">Share your experience...</label>
+                    </div>
+                    <div class="card-action right-align" style="border:none; padding-right:0;">
+                        <a class="btn-flat waves-effect waves-light" id="cancelAddReview">Cancel</a>
+                        <a class="btn orange waves-effect waves-light" id="submitReview">Post Review</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reviews List -->
+            <div class="reviews-list">
+                {% for review in reviews %}
+                <div class="card review-card" data-review-id="{{review.review_id}}">
+                    <div class="card-content">
+                        <div class="row valign-wrapper" style="margin-bottom: 0;">
+                            <div class="col s2">
+                                <div class="circle-image tenant grey lighten-3"></div>
+                            </div>
+                            <div class="col s8">
+                                <p class="review-author">{{review.tenant.name}}</p>
+                                <p class="grey-text text-darken-1">{{review.days_ago}} days ago</p>
+                            </div>
+                            {% if is_authenticated and current_user.user_id == review.tenant_id %}
+                            <div class="col s2 review-actions">
+                                <div class="edit-delete-buttons">
+                                    <a class="edit-review" href="#"><i class="material-icons tiny">edit</i></a>
+                                    <a class="delete-review" href="#"><i class="material-icons tiny">delete</i></a>
+                                </div>
+                                <div class="save-cancel-buttons" style="display: none;">
+                                    <a class="save-review" href="#"><i class="material-icons tiny">check</i></a>
+                                    <a class="cancel-edit" href="#"><i class="material-icons tiny">close</i></a>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <div class="review-content">
+                            <p class="review-text">{{review.review_text}}</p>
+                            <textarea class="edit-text materialize-textarea" style="display: none;">{{review.review_text}}</textarea>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Request Modal -->
+{% if is_authenticated and current_user.type == 'tenant' %}
+<div id="requestModal" class="modal">
+    <div class="modal-content">
+        <h4>Request to Rent</h4>
+        <p>Would you like to submit a rental request for {{apartment.apartment_name}}?</p>
+    </div>
+    <div class="modal-footer">
+        <a href="#!" class="modal-close waves-effect waves-light btn-flat">Cancel</a>
+        <a href="#!" class="modal-close waves-effect waves-light btn orange">Submit Request</a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize Materialize components
+    M.Modal.init(document.querySelectorAll('.modal'));
+    
+    // Show/Hide Add Review Area
+    const showAddReview = document.getElementById('showAddReview');
+    const addReviewArea = document.getElementById('addReviewArea');
+    const cancelAddReview = document.getElementById('cancelAddReview');
+    
+    if (showAddReview) {
+        showAddReview.addEventListener('click', function(e) {
+            e.preventDefault();
+            addReviewArea.style.display = 'block';
+            document.getElementById('new_review_text').focus();
+        });
+    }
+    
+    if (cancelAddReview) {
+        cancelAddReview.addEventListener('click', function(e) {
+            e.preventDefault();
+            addReviewArea.style.display = 'none';
+            document.getElementById('new_review_text').value = '';
+        });
+    }
+
+    // Add Review
+    const submitReview = document.getElementById('submitReview');
+    if (submitReview) {
+        submitReview.addEventListener('click', function() {
+            const reviewText = document.getElementById('new_review_text').value;
+            if (!reviewText.trim()) {
+                M.toast({html: 'Please write a review first'});
+                return;
+            }
+            
+            fetch('/api/reviews/{{apartment.apartment_id}}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    review_text: reviewText
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                M.toast({html: 'Review posted successfully', classes: 'green'});
+                setTimeout(() => location.reload(), 2000);
+            })
+            .catch(error => {
+                M.toast({html: 'Error posting review', classes: 'red'});
+            });
+        });
+    }
+
+    // Edit/Delete Review Functions
+    document.querySelectorAll('.edit-review').forEach(function(edit) {
+        edit.addEventListener('click', function(e) {
+            e.preventDefault();
+            const reviewCard = this.closest('.review-card');
+            toggleEditMode(reviewCard, true);
+        });
+    });
+
+    document.querySelectorAll('.cancel-edit').forEach(function(cancel) {
+        cancel.addEventListener('click', function(e) {
+            e.preventDefault();
+            const reviewCard = this.closest('.review-card');
+            toggleEditMode(reviewCard, false);
+        });
+    });
+
+    document.querySelectorAll('.save-review').forEach(function(save) {
+        save.addEventListener('click', function(e) {
+            e.preventDefault();
+            const reviewCard = this.closest('.review-card');
+            const reviewId = reviewCard.dataset.reviewId;
+            const newText = reviewCard.querySelector('.edit-text').value;
+            
+            if (!newText.trim()) {
+                M.toast({html: 'Review cannot be empty'});
+                return;
+            }
+
+            fetch(`/api/reviews/${reviewId}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    review_text: newText
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                M.toast({html: 'Review updated successfully', classes: 'green'});
+                setTimeout(() => location.reload(), 2000);
+            })
+            .catch(error => {
+                M.toast({html: 'Error updating review', classes: 'red'});
+            });
+        });
+    });
+
+    document.querySelectorAll('.delete-review').forEach(function(del) {
+        del.addEventListener('click', function(e) {
+            e.preventDefault();
+            if (confirm('Are you sure you want to delete this review?')) {
+                const reviewId = this.closest('.review-card').dataset.reviewId;
+                fetch(`/api/reviews/${reviewId}`, {
+                    method: 'DELETE'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    M.toast({html: 'Review deleted successfully', classes: 'green'});
+                    setTimeout(() => location.reload(), 2000);
+                })
+                .catch(error => {
+                    M.toast({html: 'Error deleting review', classes: 'red'});
+                });
+            }
+        });
+    });
+
+    function toggleEditMode(reviewCard, isEditing) {
+        const reviewText = reviewCard.querySelector('.review-text');
+        const editText = reviewCard.querySelector('.edit-text');
+        const editDelete = reviewCard.querySelector('.edit-delete-buttons');
+        const saveCancel = reviewCard.querySelector('.save-cancel-buttons');
+        
+        if (isEditing) {
+            reviewText.style.display = 'none';
+            editText.style.display = 'block';
+            editDelete.style.display = 'none';
+            saveCancel.style.display = 'block';
+            M.textareaAutoResize(editText);
+            editText.focus();
+        } else {
+            reviewText.style.display = 'block';
+            editText.style.display = 'none';
+            editDelete.style.display = 'block';
+            saveCancel.style.display = 'none';
+            editText.value = reviewText.textContent;
+        }
+    }
+});
+</script>
+{% endblock %}

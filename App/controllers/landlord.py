@@ -1,9 +1,10 @@
-from App.models import User, Landlord, Apartment, Amenity
-from App.controllers import add_amenity_to_apartment
+from App.models import User, Landlord, Apartment, Amenity, Tenant
+from App.controllers.apartment_amenity import add_amenity_to_apartment
 from App.database import db
 
+'''
 #create_landlord
-def create_landlord(name, email, password, phone_contact):
+def create_landlord(name, email, password, phone_number):
     if User.query.filter_by(email=email).first(): 
         print("Email is already taken") 
         return None
@@ -13,6 +14,7 @@ def create_landlord(name, email, password, phone_contact):
         db.session.commit()
         print(f"Landlord {new_landlord.name} has been created")
         return new_landlord
+'''
 
 #create_listing with amenities and details - application main feature 1
 def create_listing(landlord_id, apartment_name, apartment_location, number_of_units_avaliable, number_of_units_not_avaliable, apartment_details, amenities_quantity):
@@ -22,7 +24,7 @@ def create_listing(landlord_id, apartment_name, apartment_location, number_of_un
         print("This is not a valid landlord")
         return None
 
-    new_apartment = Apartment(apartment_name=apartment_name, apartment_location=apartment_location, number_of_units_avaliable=number_of_units_avaliable, number_of_units_not_avaliable=number_of_units_not_avaliable, apartment_details=apartment_details, landlord_id=landlord_id)
+    new_apartment = Apartment(apartment_name=apartment_name, apartment_location=apartment_location, number_of_units_available=number_of_units_avaliable, number_of_units_not_available=number_of_units_not_avaliable, apartment_details=apartment_details, landlord_id=landlord_id)
     db.session.add(new_apartment)
     db.session.commit()
     print(f"Apartment Listing for {new_apartment.apartment_name} has been created")
@@ -43,7 +45,7 @@ def create_listing(landlord_id, apartment_name, apartment_location, number_of_un
     
     
 #update_listing
-def update_listing(landlord_id, apartment_id, apartment_name=None, apartment_location=None, number_of_units_avaliable=None, number_of_units_not_avaliable=None, apartment_details=None):
+def update_listing(landlord_id, apartment_id, apartment_name=None, apartment_location=None, number_of_units_available=None, number_of_units_not_available=None, apartment_details=None):
     valid_landlord = Landlord.query.get(landlord_id)
     valid_apartment = Apartment.query.get(apartment_id)
 
@@ -55,7 +57,7 @@ def update_listing(landlord_id, apartment_id, apartment_name=None, apartment_loc
         print("This is not a valid apartment")
         return None
     
-    if valid_landlord.id != valid_apartment.landlord_id:
+    if valid_landlord.user_id != valid_apartment.landlord_id:
         print("This landlord is not authorized to update this listing")
         return None
     
@@ -65,11 +67,11 @@ def update_listing(landlord_id, apartment_id, apartment_name=None, apartment_loc
     if apartment_location:
         valid_apartment.apartment_location = apartment_location
 
-    if number_of_units_avaliable:
-        valid_apartment.number_of_units_avaliable = number_of_units_avaliable
+    if number_of_units_available:
+        valid_apartment.number_of_units_available = number_of_units_available
         
-    if number_of_units_not_avaliable:
-        valid_apartment.number_of_units_not_avaliable = number_of_units_not_avaliable
+    if number_of_units_not_available:
+        valid_apartment.number_of_units_not_available = number_of_units_not_available
 
     if apartment_details:
         valid_apartment.apartment_details = apartment_details
@@ -91,7 +93,7 @@ def delete_listing(landlord_id, apartment_id):
         print("This is not a valid apartment")
         return None
     
-    if valid_landlord.id != valid_apartment.landlord_id:
+    if valid_landlord.user_id != valid_apartment.landlord_id:
         print("This landlord is not authorized to delete this listing")
         return None
     
@@ -122,3 +124,16 @@ def get_landlord_apartments(landlord_id):
         for apartment in landlord_apartments
     ]
     return list_of_landlord_apartments
+
+#add tenant to an apartment
+def add_tenant_to_apartment(tenant_id, apartment_id):
+    valid_tenant = Tenant.query.get(tenant_id)
+
+    if not valid_tenant:
+        print ("This user is not a valid tenant")
+        return None
+    
+    valid_tenant.apartment_id = apartment_id
+    db.session.commit()
+    print("New tenant added to an apartment")
+    return valid_tenant
